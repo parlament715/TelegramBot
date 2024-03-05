@@ -1,7 +1,9 @@
 import pandas as pd
+from icecream import ic
+from typing import Union
 import matplotlib.pyplot as plt
 from app.database.request import to_read_db
-def get_png(table_name):
+def get_png(table_name) -> Union[None,str] :
   # Создание данных для таблицы
   data_name = to_read_db(table_name,"who")
   data_breakfast = to_read_db(table_name,"breakfast_dormitory")
@@ -11,6 +13,9 @@ def get_png(table_name):
           'Завтрак': data_breakfast,
           'Обед': data_lunch,
           'Ужин' : data_dinner}
+  ic(data)
+  if data['Название'] == []: ### Если таблица пустая то return none
+    return "Error"
 
   # Создание DataFrame из данных
   df = pd.DataFrame(data)
@@ -23,6 +28,7 @@ def get_png(table_name):
   tabla.set_fontsize(12)
   tabla.scale(1.5, 1.5)
   plt.savefig('table.png', bbox_inches='tight', pad_inches=0.05)
+  return None
   # plt.show()
 
 

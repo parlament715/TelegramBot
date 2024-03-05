@@ -1,5 +1,7 @@
 from aiogram.types import ReplyKeyboardMarkup, ReplyKeyboardRemove
 from aiogram.types import KeyboardButton as KButton
+from aiogram.types import InlineKeyboardMarkup as InlKB
+from aiogram.types import InlineKeyboardButton as InKButton
 
 from datetime import  datetime, timedelta 
 
@@ -22,6 +24,13 @@ keyboard_0x001 = [[KButton(text='Завтрак')],
                   ]
 
 kb3 = ReplyKeyboardMarkup(resize_keyboard=True,keyboard=keyboard_0x001)
+
+kb4 = InlKB(inline_keyboard=[
+  [InKButton(text="Да",callback_data="Yes"),
+  InKButton(text="Нет",callback_data="No")]
+])
+
 remove = ReplyKeyboardRemove()
+
 
 
