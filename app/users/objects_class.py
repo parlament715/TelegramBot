@@ -1,7 +1,7 @@
 from app.users.main_class import my_user
 from icecream import ic
 
-Eta = my_user("2","Классный руководитель","Эта","write")
+Eta = my_user("819514102a","Классный руководитель","Эта","write")
 # Beta = my_user("819514102","Классный руководитель","Бета","read")
 
 all_list = [Eta]
