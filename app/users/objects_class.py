@@ -1,8 +1,9 @@
 from app.users.main_class import my_user
 from icecream import ic
 
-Eta = my_user("819514102","Воспитатель","4 Этаж","write")
-Beta = my_user("6324858739","Классный советник","Бета","write")
+Eta = my_user(id = "819514102", func ="write", role = "Классный советник", name = "Бета",classroom_number = "10")
+# Beta = my_user(id = "504535913", func = "read")
+Beta = my_user(id = "6324858739", func = "read")
 
 all_list = [Eta,Beta]
 # all_list = [Beta]
@@ -26,6 +27,12 @@ def find_user_role_by_id(user_id):
     if user.id == str(user_id):
       return user.role
   return None
+def find_user_classroom_number_by_id(user_id):
+  for user in all_list:
+    if user.id == str(user_id):
+      return user.classroom_number
+  return None
+### хранить данные в словаре
 
  
   

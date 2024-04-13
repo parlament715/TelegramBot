@@ -3,13 +3,14 @@ from aiogram.types import KeyboardButton as KButton
 from aiogram.types import InlineKeyboardMarkup as InlKB
 from aiogram.types import InlineKeyboardButton as InKButton
 
-from datetime import  datetime, timedelta 
+from datetime import timedelta,datetime
+from config import today 
 
 kb1 = ReplyKeyboardMarkup(resize_keyboard=True, keyboard=
                          [[KButton(text = 'Я старший воспитатель')],
-                          [KButton(text = 'Я воспитатель')]])
+                          [KButton(text = 'Я воспитатель')],
+                          [KButton(text = 'Я классный советник')]])
 
-today = datetime.now().date() + timedelta(days=2)
 
 keyboard_0x000 = [[KButton(text=f'Сегодня {str(today)}')],
                   [KButton(text = f'Завтра {str(today + timedelta(days = 1))}')],
@@ -37,9 +38,9 @@ kb_date_all = ReplyKeyboardMarkup(resize_keyboard=True,keyboard=keyboard_0x000)
 
 kb_date_for_teacher = ReplyKeyboardMarkup(resize_keyboard=True,keyboard=keyboard_0x002)
 
+kb_check_other_date = ReplyKeyboardMarkup(resize_keyboard=True,keyboard=[[KButton(text = 'Посмотреть другую дату')]])
 
-
-def gen_keyboard_time_for_vosp(date:str):
+def gen_keyboard_time_for_vosp(date:str) -> ReplyKeyboardMarkup:
   date_obj = datetime.strptime(date,'%Y-%m-%d')
   if date_obj.weekday() == 6:
     keyboard_0x002 = [[KButton(text='Завтрак'),KButton(text='Обед')],

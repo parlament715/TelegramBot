@@ -3,16 +3,23 @@ from icecream import ic
 from typing import Union
 import matplotlib.pyplot as plt
 from app.database.request import to_read_db
+# from config import today
 def get_png(table_name) -> Union[None,str] :
   # Создание данных для таблицы
   data_name = to_read_db(table_name,"who")
-  data_breakfast = to_read_db(table_name,"breakfast_dormitory")
-  data_lunch = to_read_db(table_name,"lunch_dormitory")
-  data_dinner = to_read_db(table_name,"dinner_dormitory")
+  data_breakfast = to_read_db(table_name,"breakfast")
+  data_snack = to_read_db(table_name,"snacks")
+  data_lunch = to_read_db(table_name,"lunch")
+  data_dinner = to_read_db(table_name,"dinner")
+  data_second_dinner = to_read_db(table_name,"second_dinner")
   data = {'Название': data_name,
           'Завтрак': data_breakfast,
           'Обед': data_lunch,
-          'Ужин' : data_dinner}
+          'Полдник': data_snack,
+          'Ужин' : data_dinner,
+          'Второй ужин' : data_second_dinner}
+  # if today == 6:  # today is Sunday
+  #   data['Обед'] = data_lunch_dormitory
   ic(data)
   if data['Название'] == []: ### Если таблица пустая то return none
     return "Error"
@@ -30,5 +37,7 @@ def get_png(table_name) -> Union[None,str] :
   plt.savefig('table.png', bbox_inches='tight', pad_inches=0.05)
   return None
   # plt.show()
+
+
 
 
