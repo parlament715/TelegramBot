@@ -1,7 +1,7 @@
 from app.users.main_class import my_user
 from icecream import ic
 
-Eta = my_user(id = "819514102", func ="write", role = "Классный советник", name = "Бета",classroom_number = "10")
+Eta = my_user(id = "819514102", func ="write", role = "Классный советник", name = "кси",classroom_number = "11")
 # Beta = my_user(id = "504535913", func = "read")
 Beta = my_user(id = "6324858739", func = "read")
 

@@ -1,6 +1,8 @@
 import sqlite3
 from icecream import ic
 from typing import Union, Optional
+import logging
+from docxtpl import DocxTemplate
 # from app.database.table import dataframe_to_png_with_subcolumns
 
 def to_create(date):
@@ -14,8 +16,7 @@ def to_create(date):
                     breakfast TEXT, 
                     lunch TEXT, 
                     snacks TEXT, 
-                    dinner TEXT, 
-                    second_dinner TEXT, 
+                    dinner TEXT,  
                     role TEXT)
                     ''')
                 
@@ -34,7 +35,6 @@ def to_write(dict : dict):
             "Обед": "lunch",
             "Полдник": "snacks",
             "Ужин": "dinner",
-            "Второй ужин": "second_dinner",
         }
 
     time = table_columns[time_]
@@ -61,14 +61,12 @@ def check_on_exist(dict: dict) -> Optional[tuple]:
     name = dict["user_name"]
     my_date = dict["date"]
     time_ = dict["time"]
-    user_role = dict["user_role"]
 
     table_columns = {
             "Завтрак": "breakfast",
             "Обед": "lunch",
             "Полдник": "snacks",
             "Ужин": "dinner",
-            "Второй ужин": "second_dinner",
         }
 
     time = table_columns[time_]
@@ -81,21 +79,94 @@ def check_on_exist(dict: dict) -> Optional[tuple]:
     return None
 
 
-# def get_data_for_docx(date:str) -> dict:
-#     to_create(date)
+def sql_call_read(date : str, column : str, role: str):
+    column11 = []
+    column10 = []
+    try:
+        temp = cursor.execute(f'''SELECT "{column}" FROM "{date}" WHERE "role" = "{role}" ''').fetchall()
+        for i in temp:
+            if i[0] != None:
+                column11.append(int((i[0]).split("/")[0]))
+                column10.append(int((i[0]).split("/")[1]))
+    except:
+        logging.error("request error", exc_info=True)
+    return column11, column10
 
-#     cursor.execute(f'''SELECT "breakfast" FROM "{date}" WHERE "role" = "Воспитатель" ''')
-#     breakfast_class_10_dorm = 
-#     breakfast_class_10_city = 
-#     breakfast_class_11_dorm = 
-#     breakfast_class_11_city = 
-#     lunch_class_10_dorm = 
-#     lunch_class_10_city = 
-#     lunch_class_11_dorm = 
-#     lunch_class_11_city = 
-#     dinner_class_10_dorm = 
-#     dinner_class_10_city = 
-#     dinner_class_11_dorm = 
-#     dinner_class_11_city = 
+def fill_template(template_path : str, output_path : str, context : dict):
+    # Загрузка шаблона
+    doc = DocxTemplate(template_path)
+    # Замена плейсхолдеров
+    doc.render(context)
+    # Сохранение документа
+    doc.save(output_path)
+
+def get_data_for_docx(date:str) -> dict:
+    to_create(date)
+    breakfast_class_11_dorm, breakfast_class_10_dorm = sql_call_read(date, "breakfast", "Воспитатель")      
+    breakfast_class_11_city, breakfast_class_10_city = sql_call_read(date, "breakfast", "Классный советник")
+    sum_breakfast_class_11_dorm = sum(breakfast_class_11_dorm)
+    sum_breakfast_class_10_dorm = sum(breakfast_class_10_dorm)
+    sum_breakfast_class_10_city = sum(breakfast_class_10_city)
+    sum_breakfast_class_11_city = sum(breakfast_class_11_city)
+
+    dinner_class_11_dorm,dinner_class_10_dorm = sql_call_read(date, "dinner", "Воспитатель")
+    sum_dinner_class_11_dorm = sum(dinner_class_11_dorm)
+    sum_dinner_class_10_dorm = sum(dinner_class_10_dorm)
+
+    _temp_lunch_class_11, _temp_lunch_class_10 = sql_call_read(date, "lunch", "Классный советник")
+    sum_lunch_class_11 = sum(_temp_lunch_class_11)
+    sum_lunch_class_10 = sum(_temp_lunch_class_10)
+    sum_lunch_class_10_city = sum_lunch_class_10 - sum_dinner_class_10_dorm
+    sum_lunch_class_11_city = sum_lunch_class_11 - sum_dinner_class_11_dorm
+    sum_lunch_class_10_dorm = sum_dinner_class_10_dorm
+    sum_lunch_class_11_dorm = sum_dinner_class_11_dorm
+
+    _temp_snacks_class_11, _temp_snacks_class_10 = sql_call_read(date, "snacks", "Классный советник")
+    sum_snacks_class_11 = sum(_temp_snacks_class_11)
+    sum_snacks_class_10 = sum(_temp_snacks_class_10)
+    sum_snacks_class_10_city = sum_snacks_class_10 - sum_dinner_class_10_dorm
+    sum_snacks_class_11_city = sum_snacks_class_11 - sum_dinner_class_11_dorm
+    sum_snacks_class_10_dorm = sum_dinner_class_10_dorm
+    sum_snacks_class_11_dorm = sum_dinner_class_11_dorm
+    
+    dinner_class_11_dorm,dinner_class_10_dorm = sql_call_read(date, "dinner", "Воспитатель")
+
+    #### разбиваем дату 
+    year,month,day = map(int, date.split('-'))
+    months_genitive = [
+        'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+        'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
+    ]
+    month = months_genitive[month - 1]
+    content = {
+        "data_num" : str(day),
+        "data_month" : month,
+        "data_year" : str(year),
+        "a" : str(sum_breakfast_class_10_city + sum_breakfast_class_11_city),
+        "b" : str(sum_breakfast_class_10_dorm + sum_breakfast_class_11_dorm),
+        "c" : str(sum_lunch_class_10_city + sum_lunch_class_11_city),
+        "d" : str(sum_lunch_class_10_dorm + sum_lunch_class_11_dorm),
+        "e" : str(sum_snacks_class_10_city + sum_snacks_class_11_city),
+        "f" : str(sum_snacks_class_10_dorm + sum_snacks_class_11_dorm),
+        "g" : "0",
+        "h" : str(sum_dinner_class_10_dorm + sum_dinner_class_11_dorm),
+        "i" : str(sum_breakfast_class_10_city),
+        "j" : str(sum_breakfast_class_10_dorm),
+        "k" : str(sum_breakfast_class_11_city),
+        "l" : str(sum_breakfast_class_11_dorm),
+        "m" : str(sum_lunch_class_10_city),
+        "n" : str(sum_lunch_class_10_dorm),
+        "o" : str(sum_lunch_class_11_city),
+        "p" : str(sum_lunch_class_11_dorm),
+        "q" : str(sum_snacks_class_10_city),
+        "r" : str(sum_snacks_class_10_dorm),
+        "s" : str(sum_snacks_class_11_city),
+        "t" : str(sum_snacks_class_11_dorm),
+        "u" : "0",
+        "v" : "0",
+        "w" : str(sum_dinner_class_10_dorm),
+        "x" : str(sum_dinner_class_11_dorm),
+    }
+    fill_template("example.docx","docx.docx",content)
 
     

@@ -3,7 +3,7 @@ from aiogram.filters import CommandStart, StateFilter
 from app.keyboard import kb1, kb_time_for_teacher, kb_date_all,kb_date_for_teacher, kb4, remove,gen_keyboard_time_for_vosp, kb_check_other_date
 from aiogram import F,Router
 from aiogram.fsm.context import FSMContext
-from app.database.request import to_write,check_on_exist
+from app.database.request import to_write,check_on_exist,get_data_for_docx
 from app.database.table import get_png
 from aiogram.types import FSInputFile
 from loader import bot
@@ -78,11 +78,14 @@ async def state_give_data_reaction(message : Message, state : FSMContext):
         message_text = message.text.split()[1]
     else:
         message_text = message.text
+    get_data_for_docx(message_text)
     if get_png(message_text) == "Error":
         await message.answer('Ошибка, этой таблицы скорее всего пустая', reply_markup=kb_check_other_date)
     else:
         photo = FSInputFile("table.png")
+        file = FSInputFile("docx.docx")
         await bot.send_photo(chat_id=message.chat.id,photo=photo,reply_markup=kb_check_other_date)
+        await bot.send_document(chat_id=message.chat.id,document=file)
 
 ########################## Запись ###############
 

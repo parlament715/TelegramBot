@@ -11,13 +11,11 @@ def get_png(table_name) -> Union[None,str] :
   data_snack = to_read_db(table_name,"snacks")
   data_lunch = to_read_db(table_name,"lunch")
   data_dinner = to_read_db(table_name,"dinner")
-  data_second_dinner = to_read_db(table_name,"second_dinner")
   data = {'Название': data_name,
           'Завтрак': data_breakfast,
           'Обед': data_lunch,
           'Полдник': data_snack,
-          'Ужин' : data_dinner,
-          'Второй ужин' : data_second_dinner}
+          'Ужин' : data_dinner,}
   # if today == 6:  # today is Sunday
   #   data['Обед'] = data_lunch_dormitory
   ic(data)

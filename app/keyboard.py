@@ -43,14 +43,14 @@ kb_check_other_date = ReplyKeyboardMarkup(resize_keyboard=True,keyboard=[[KButto
 def gen_keyboard_time_for_vosp(date:str) -> ReplyKeyboardMarkup:
   date_obj = datetime.strptime(date,'%Y-%m-%d')
   if date_obj.weekday() == 6:
-    keyboard_0x002 = [[KButton(text='Завтрак'),KButton(text='Обед')],
-                      [KButton(text='Полдник'),KButton(text = 'Ужин')],
-                      [KButton(text = 'Второй ужин')]
-                     ]
+    keyboard_0x002 = [[KButton(text='Завтрак')],
+                      [KButton(text='Обед')],
+                      [KButton(text='Полдник')],
+                      [KButton(text = 'Ужин')],
+                      ]
   else:
     keyboard_0x002 = [[KButton(text='Завтрак')],
                       [KButton(text = 'Ужин')],
-                      [KButton(text = 'Второй ужин')]
                      ]
     
   return ReplyKeyboardMarkup(resize_keyboard=True,keyboard=keyboard_0x002)
