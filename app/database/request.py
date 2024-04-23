@@ -17,7 +17,8 @@ def to_create(date):
                     lunch TEXT, 
                     snacks TEXT, 
                     dinner TEXT,  
-                    role TEXT)
+                    role TEXT,
+                    class_num INTEGER)
                     ''')
                 
     
@@ -29,6 +30,10 @@ def to_write(dict : dict):
         number = dict["num"].replace(" ","/")
     except:
         number = dict["num"]
+    try:
+        class_num = dict["classroom_number"]
+    except:
+        class_num = None
     user_role = dict["user_role"]
     table_columns = {
             "Завтрак": "breakfast",
@@ -42,21 +47,35 @@ def to_write(dict : dict):
     to_create(str(my_date))
     res = cursor.execute(f''' SELECT {time} FROM "{str(my_date)}" WHERE who = "{name}" ''' ).fetchone()
     if res == None:
-        cursor.execute(f''' INSERT INTO "{str(my_date)}" 
-                       (who, role, {time}) VALUES ("{name}","{user_role}","{number}")''') ### если записи ещё не было то добавляем
+        if class_num != None:
+            cursor.execute(f''' 
+                       INSERT INTO "{str(my_date)}" 
+                       (who, role, {time},class_num) VALUES 
+                       ("{name}","{user_role}","{number}",{class_num})
+                         ''') ### если записи ещё не было то добавляем
+        else:
+            cursor.execute(f''' 
+                       INSERT INTO "{str(my_date)}" 
+                       (who, role, {time}) VALUES 
+                       ("{name}","{user_role}","{number}")
+                         ''') ### если записи ещё не было то добавляем
     else:
         cursor.execute(f''' UPDATE "{str(my_date)}" SET {time} = "{number}" WHERE who = "{name}" ''') ### если была то уже обновляем то что было 
     conn.commit()
     conn.close()
 
-def to_read_db(table_name : str,columns : str) -> list:
+def to_read_db(table_name : str,columns : str, where : Optional[str] = None) -> list:
     to_create(table_name)
-    cursor.execute(f'''SELECT {columns} FROM "{table_name}"''')
+    if where != None:
+        cursor.execute(f'''SELECT {columns} FROM "{table_name}" WHERE {where}''')
+    else:
+        cursor.execute(f'''SELECT {columns} FROM "{table_name}"''')
     a = cursor.fetchall()
     b = []
     for i in a:
-        b.append(str(i[0]))
+        b.append(str(i[0])) #### преобразовываем в массив из кортежа для красоты
     return b
+
 def check_on_exist(dict: dict) -> Optional[tuple]:
     name = dict["user_name"]
     my_date = dict["date"]
@@ -163,8 +182,8 @@ def get_data_for_docx(date:str) -> dict:
         "s" : str(sum_snacks_class_11_city),
         "t" : str(sum_snacks_class_11_dorm),
         "u" : "0",
-        "v" : "0",
-        "w" : str(sum_dinner_class_10_dorm),
+        "v" : str(sum_dinner_class_10_dorm),
+        "w" : "0",
         "x" : str(sum_dinner_class_11_dorm),
     }
     fill_template("example.docx","docx.docx",content)

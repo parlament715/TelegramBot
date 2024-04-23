@@ -17,7 +17,7 @@ async def main():
 
 if __name__ == "__main__":
     logging.basicConfig(format='%(message)s :%(name)s -%(asctime)s'
-                        ,level=logging.INFO)
+                        ,level=logging.DEBUG)
     logging.getLogger('matplotlib').setLevel(logging.WARNING) ## отключает matplolib
     asyncio.run(main())
 

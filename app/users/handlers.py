@@ -80,11 +80,15 @@ async def state_give_data_reaction(message : Message, state : FSMContext):
         message_text = message.text
     get_data_for_docx(message_text)
     if get_png(message_text) == "Error":
-        await message.answer('Ошибка, этой таблицы скорее всего пустая', reply_markup=kb_check_other_date)
+        await message.answer('Ошибка, этой таблицы скорее всего пустая или недостаточно заполнена', reply_markup=kb_check_other_date)
     else:
-        photo = FSInputFile("table.png")
+        png_class_10 = FSInputFile("table_class_10.png")
+        png_class_11 = FSInputFile("table_class_11.png")
+        png_dorm = FSInputFile("table_dorm.png")
         file = FSInputFile("docx.docx")
-        await bot.send_photo(chat_id=message.chat.id,photo=photo,reply_markup=kb_check_other_date)
+        await bot.send_photo(chat_id=message.chat.id,photo=png_class_10)
+        await bot.send_photo(chat_id=message.chat.id,photo=png_class_11)
+        await bot.send_photo(chat_id=message.chat.id,photo=png_dorm,reply_markup=kb_check_other_date)
         await bot.send_document(chat_id=message.chat.id,document=file)
 
 ########################## Запись ###############
@@ -208,9 +212,9 @@ async def step_2_reaction(message : Message, state : FSMContext):
 async def step_3_reaction(message : Message, state : FSMContext):
     await message.answer("Успешно сохранено")
     data = await state.get_data()
-    if data["classroom_number"] == '10':
+    if data["classroom_number"] == 10:
         await state.update_data(num = f'0 {message.text}')
-    elif data["classroom_number"] == '11':
+    elif data["classroom_number"] == 11:
         await state.update_data(num = f'{message.text} 0')
     ic(await state.get_data())
     to_write(await state.get_data())
