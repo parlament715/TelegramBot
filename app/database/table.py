@@ -4,13 +4,22 @@ from typing import Union
 import matplotlib.pyplot as plt
 from app.database.request import to_read_db
 # from config import today
+def split_foreach(a : list, split : str, num_list_elem : int) -> list:
+   b = []
+   for elem in a:
+      if elem != "None":
+        b.append(elem.split(split)[num_list_elem])
+      else:
+        b.append("None")
+   return b
+
 def get_png(table_name) -> Union[None,str] :
   # Создание данных для таблицы
   data_name_class_10 = to_read_db(table_name,"who",where="class_num=10")
-  data_breakfast_class_10 = to_read_db(table_name,"breakfast",where="class_num=10")
-  data_snack_class_10 = to_read_db(table_name,"snacks",where="class_num = 10")
-  data_lunch_class_10 = to_read_db(table_name,"lunch",where="class_num = 10")
-  data_dinner_class_10 = to_read_db(table_name,"dinner",where="class_num = 10")
+  data_breakfast_class_10 = split_foreach(to_read_db(table_name,"breakfast",where="class_num=10"),"/",1)
+  data_snack_class_10 = split_foreach(to_read_db(table_name,"snacks",where="class_num = 10"),"/",1)
+  data_lunch_class_10 = split_foreach(to_read_db(table_name,"lunch",where="class_num = 10"),"/",1)
+  data_dinner_class_10 = split_foreach(to_read_db(table_name,"dinner",where="class_num = 10"),"/",1)
   data_class_10 = {'Название': data_name_class_10,
           'Завтрак': data_breakfast_class_10,
           'Обед': data_lunch_class_10,
@@ -18,10 +27,10 @@ def get_png(table_name) -> Union[None,str] :
           'Ужин' : data_dinner_class_10,}
   
   data_name_class_11 = to_read_db(table_name,"who",where="class_num = 11")
-  data_breakfast_class_11 = to_read_db(table_name,"breakfast",where="class_num = 11")
-  data_snack_class_11 = to_read_db(table_name,"snacks",where="class_num = 11")
-  data_lunch_class_11 = to_read_db(table_name,"lunch",where="class_num = 11")
-  data_dinner_class_11 = to_read_db(table_name,"dinner",where="class_num = 11")
+  data_breakfast_class_11 = split_foreach(to_read_db(table_name,"breakfast",where="class_num = 11"),"/",0)
+  data_snack_class_11 = split_foreach(to_read_db(table_name,"snacks",where="class_num = 11"),"/",0)
+  data_lunch_class_11 = split_foreach(to_read_db(table_name,"lunch",where="class_num = 11"),"/",0)
+  data_dinner_class_11 = split_foreach(to_read_db(table_name,"dinner",where="class_num = 11"),"/",0)
   data_class_11 = {'Название': data_name_class_11,
           'Завтрак': data_breakfast_class_11,
           'Обед': data_lunch_class_11,

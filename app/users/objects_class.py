@@ -1,9 +1,9 @@
 from app.users.main_class import my_user
 from icecream import ic
 
-Eta = my_user(id = "6324858739", func ="write", role = "Классный советник", name = "Ета", classroom_number = 10)
+Eta = my_user(id = "6324858739", func ="write", role = "Классный советник", name = "Кси", classroom_number = 11)
 # Beta = my_user(id = "504535913", func = "read")
-Beta = my_user(id = "819514102", func = "read")
+Beta = my_user(id = "819514102d", func = "read")
 
 all_list = [Eta,Beta]
 # all_list = [Beta]

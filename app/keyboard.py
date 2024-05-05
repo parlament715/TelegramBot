@@ -70,7 +70,15 @@ kb4 = InlKB(inline_keyboard=[
   InKButton(text="Нет",callback_data="No")]
 ])
 
+
+
 remove = ReplyKeyboardRemove()
 
+kb5 = ReplyKeyboardMarkup(resize_keyboard=True,
+                          keyboard=[[KButton(text = 'Записать на ЭТУ ЖЕ дату')],
+                                    [KButton(text = "Записать на ДРУГУЮ дату")]])
 
+kb6 = ReplyKeyboardMarkup(resize_keyboard=True,
+                          keyboard=[[KButton(text = '10')],
+                                    [KButton(text = "11")]])
 
