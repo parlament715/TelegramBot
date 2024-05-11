@@ -142,7 +142,10 @@ async def call_back_data_reaction_Yes(call : CallbackQuery, state : FSMContext):
     await call.answer()
     data = await state.get_data()
     if data["user_role"] == "Классный советник":
-        await call.message.answer("Сколько человек (Напишите числом)")
+        if data["time"] == "Завтрак":
+            await call.message.answer("Сколько человек (Напишите числом)")
+        elif data["time"] in ("Обед","Полдник"):
+            await call.message.answer('Сколько человек (количество городских, через пробел количество интернатных)')
     elif data["user_role"] == "Воспитатель":
         await call.message.answer('Сколько человек (количество 11-классников, через пробел количество 10-классников)')
     await state.set_state(Form.num)
@@ -192,7 +195,9 @@ async def step_2_reaction(message : Message, state : FSMContext):
         await state.set_state(Form.num)
     else:
         await state.set_state("already exist")
-        await message.answer(f'Эта запись уже существует "{res[0]}" \nВы хотите её заменить?',reply_markup=kb4)
+        await message.answer(f'Эта запись уже существует : \n11 класс : {res[0]}\n10 класс : {res[1]} \nВы хотите её заменить?',reply_markup=kb4)
+ 
+            
 
 @router.message(StateFilter(Form.num),Filter_data("user_role","Воспитатель"))
 async def step_3_reaction(message : Message, state : FSMContext):
@@ -255,12 +260,20 @@ async def step_2_reaction(message : Message, state : FSMContext):
     await state.update_data(time = message.text)
     data = await state.get_data()
     res = check_on_exist(data)
-    if res == None: 
-        await message.answer("Сколько человек (Напишите числом)",reply_markup=remove)
+    if res == None:
+        if message.text == "Обед" or message.text == "Полдник":
+            await message.answer('Сколько человек (количество городских, через пробел количество интернатных)',reply_markup=remove)
+        else:
+            await message.answer("Сколько человек (Напишите числом)",reply_markup=remove)
         await state.set_state(Form.num)
     else:
         await state.set_state("already exist")
-        await message.answer(f'Эта запись уже существует "{res[0]}" \nВы хотите её заменить?',reply_markup=kb4)
+        if data["time"] == "Завтрак":
+            await message.answer(f'Эта запись уже существует "{res[0]}" \nВы хотите её заменить?',reply_markup=kb4)    
+        if data["time"] == "Полдник" or data["time"] == "Обед":
+            await message.answer(f'Эта запись уже существует : \nгород : {res[0]}\nинтернат : {res[1]} \nВы хотите её заменить?',reply_markup=kb4)
+        
+
 
 
         
@@ -268,15 +281,35 @@ async def step_2_reaction(message : Message, state : FSMContext):
 
 @router.message(StateFilter(Form.num),Filter_data("user_role","Классный советник"))
 async def step_3_reaction(message : Message, state : FSMContext):
-    await message.answer("Успешно сохранено",reply_markup=kb5)
-    data = await state.get_data()
-    if data["classroom_number"] == 10:
-        await state.update_data(num = f'0 {message.text}')
-    elif data["classroom_number"] == 11:
-        await state.update_data(num = f'{message.text} 0')
-    ic(await state.get_data())
-    to_write(await state.get_data())
-    await state.set_state('chose')
+    old_data = await state.get_data()
+    if old_data["time"] == "Обед" or old_data["time"] == "Полдник":
+        try:
+            if type(int(message.text.split()[0])) == int and type(int(message.text.split()[1])) == int:
+                
+                await state.update_data(num = message.text)
+                data = await state.get_data()
+                # ic(data)
+                to_write(data)
+                await state.set_state('chose')
+                await message.answer("Успешно сохранено",reply_markup=kb5)
+            else:
+                await state.set_state(Form.num) 
+                await message.answer("Некорректный  формат, пожалуйста введите ещё раз два числа через пробел  в указанном формате",reply_markup=remove)
+        except IndexError:
+            await state.set_state(Form.num)
+            await message.answer("Некорректный  формат, пожалуйста введите ещё раз ДВА числа через ПРОБЕЛ  в указанном формате",reply_markup=remove)
+        except ValueError:
+            await state.set_state(Form.num) 
+            await message.answer("Некорректный  формат, пожалуйста введите еще раз два ЧИСЛА через пробел  в указанном формате",reply_markup=remove)
+    else:
+        try:
+            await state.update_data(num = str(int(message.text))) ### проверяем это число или нет
+            data = await state.get_data()
+            to_write(data)
+            await message.answer("Успешно сохранено",reply_markup=kb5)
+            await state.set_state('chose')    
+        except ValueError:
+            await message.answer("Некорректный  формат, пожалуйста введите еще раз ЧИСЛО")
 
 
 ##################### /help ################

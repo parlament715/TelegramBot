@@ -20,6 +20,3 @@ if __name__ == "__main__":
                         ,level=logging.DEBUG)
     logging.getLogger('matplotlib').setLevel(logging.WARNING) ## отключает matplolib
     asyncio.run(main())
-
-
-
