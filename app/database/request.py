@@ -140,23 +140,26 @@ def fill_template(template_path : str, output_path : str, context : dict):
 
 def get_data_for_docx(date:str) -> dict:
     to_create(date)
-    breakfast_city_11 = sum([int(x) for x in to_read_db(date,"breakfast_city_11",where="class_num=11")])
-    lunch_dorm_11 = sum([int(x) for x in to_read_db(date,"lunch_dorm_11",where="class_num=11")])
-    lunch_city_11 = sum([int(x) for x in to_read_db(date,"lunch_city_11",where="class_num=11")])
-    snack_dorm_11 = sum([int(x) for x in to_read_db(date,"snack_dorm_11",where="class_num=11")])
-    snack_city_11 = sum([int(x) for x in to_read_db(date,"snack_city_11",where="class_num=11")])
+    try:
+        breakfast_city_11 = sum([int(x) for x in to_read_db(date,"breakfast_city_11",where="class_num=11")])
+        lunch_dorm_11 = sum([int(x) for x in to_read_db(date,"lunch_dorm_11",where="class_num=11")])
+        lunch_city_11 = sum([int(x) for x in to_read_db(date,"lunch_city_11",where="class_num=11")])
+        snack_dorm_11 = sum([int(x) for x in to_read_db(date,"snack_dorm_11",where="class_num=11")])
+        snack_city_11 = sum([int(x) for x in to_read_db(date,"snack_city_11",where="class_num=11")])
 
-    breakfast_city_10 = sum([int(x) for x in to_read_db(date,"breakfast_city_10",where="class_num=10")])
-    lunch_dorm_10 = sum([int(x) for x in to_read_db(date,"lunch_dorm_10",where="class_num=10")])
-    lunch_city_10 = sum([int(x) for x in to_read_db(date,"lunch_city_10",where="class_num=10")])
-    snack_dorm_10 = sum([int(x) for x in to_read_db(date,"snack_dorm_10",where="class_num=10")])
-    snack_city_10 = sum([int(x) for x in to_read_db(date,"snack_city_10",where="class_num=10")])
+        breakfast_city_10 = sum([int(x) for x in to_read_db(date,"breakfast_city_10",where="class_num=10")])
+        lunch_dorm_10 = sum([int(x) for x in to_read_db(date,"lunch_dorm_10",where="class_num=10")])
+        lunch_city_10 = sum([int(x) for x in to_read_db(date,"lunch_city_10",where="class_num=10")])
+        snack_dorm_10 = sum([int(x) for x in to_read_db(date,"snack_dorm_10",where="class_num=10")])
+        snack_city_10 = sum([int(x) for x in to_read_db(date,"snack_city_10",where="class_num=10")])
 
-    breakfast_dorm_11 = sum([int(x) for x in to_read_db(date,"breakfast_dorm_11",where='role = "Воспитатель"')])
-    breakfast_dorm_10 = sum([int(x) for x in to_read_db(date,"breakfast_dorm_10",where='role = "Воспитатель"')])
-    dinner_dorm_10 = sum([int(x) for x in to_read_db(date,"dinner_dorm_10",where='role = "Воспитатель"')])
-    dinner_dorm_11 = sum([int(x) for x in to_read_db(date,"dinner_dorm_11",where='role = "Воспитатель"')])
-    
+        breakfast_dorm_11 = sum([int(x) for x in to_read_db(date,"breakfast_dorm_11",where='role = "Воспитатель"')])
+        breakfast_dorm_10 = sum([int(x) for x in to_read_db(date,"breakfast_dorm_10",where='role = "Воспитатель"')])
+        dinner_dorm_10 = sum([int(x) for x in to_read_db(date,"dinner_dorm_10",where='role = "Воспитатель"')])
+        dinner_dorm_11 = sum([int(x) for x in to_read_db(date,"dinner_dorm_11",where='role = "Воспитатель"')])
+    except ValueError:
+        return "Error"
+
 
     #### разбиваем дату 
     year,month,day = map(int, date.split('-'))
