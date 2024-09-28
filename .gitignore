@@ -6,3 +6,4 @@ __pycache__
 *.db
 app/smth.py
 docx.docx
+venv
