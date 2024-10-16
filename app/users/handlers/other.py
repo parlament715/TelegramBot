@@ -8,9 +8,9 @@ from app.database.table import get_png
 from aiogram.types import FSInputFile
 from loader import bot
 from app.users.filter_class import FilterId, Filter_data
-from app.users.objects_class import read_list, write_list
 from icecream import ic
-from app.users.objects_class import find_user_name_by_id, find_user_role_by_id, find_user_classroom_number_by_id
+from app.users.objects_class import ID_TEACHER, ID_VOSP, ID_MAIN_VOSP
+from app.users.objects_class import find_user_name_by_id, find_user_classroom_number_by_id
 from app.users.main_class import Form
 from config import ADMIN
 
@@ -18,16 +18,15 @@ router = Router()
 
 
 ##################### /help ################
-@router.message(F.text == "/help", FilterId(read_list))
+@router.message(F.text == "/help", FilterId(ID_TEACHER + ID_VOSP))
 async def help_reaction_for_read(message: Message):
     await message.answer(
         'Для того чтобы посмотреть данные введите /start далее следуйте инструкциям. На этапе выбора даты можете ввести свою дату так и выбрать вариант из предложенных, в случае отсутствия записи вы получи сообщение : "Ошибка, этой таблицы скорее всего пустая". После каждого просмотра придётся вводить команду /start заново. Если возникли трудности обращайтесь в лс @paralment'
     )
 
 
-@router.message(F.text == "/help", FilterId(write_list))
+@router.message(F.text == "/help", FilterId(ID_MAIN_VOSP))
 async def help_reaction_for_read(message: Message):
-
     await message.answer(
         'Для того чтобы занести данные вам нужно написать команду /start далее следовать согласно инструкциям, после каждой записи нужно заново прописывать команду /start'
     )

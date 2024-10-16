@@ -12,11 +12,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
 async def main():
-    # dp.include_router(vosp.router)
-    # dp.include_router(main_vosp.router)
-    # dp.include_router(teacher.router)
-    # dp.include_router(admin.router)
-    # dp.include_router(other.router)
+    dp.include_router(vosp.router)
+    dp.include_router(main_vosp.router)
+    dp.include_router(teacher.router)
+    dp.include_router(admin.router)
+    dp.include_router(other.router)
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 

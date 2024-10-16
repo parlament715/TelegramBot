@@ -8,9 +8,9 @@ from app.database.table import get_png
 from aiogram.types import FSInputFile
 from loader import bot
 from app.users.filter_class import FilterId, Filter_data
-from app.users.objects_class import read_list, write_list
+from app.users.objects_class import ID_VOSP
 from icecream import ic
-from app.users.objects_class import find_user_name_by_id, find_user_role_by_id, find_user_classroom_number_by_id
+from app.users.objects_class import find_user_name_by_id, find_user_classroom_number_by_id
 from app.users.main_class import Form
 from config import ADMIN
 from app.users.handlers.other import rewrite_state_data
@@ -42,16 +42,14 @@ async def call_back_data_reaction_Yes(call: CallbackQuery, state: FSMContext):
     await state.set_state(Form.num)
 
 
-@router.message(FilterId(write_list), CommandStart())
+@router.message(FilterId(ID_VOSP), CommandStart())
 async def second_keyboard_reaction(message: Message, state: FSMContext):
-    print(f"{message.from_user.id} - {message.from_user.full_name} - начал запись teacher")
+    print(f"{message.from_user.id} - {message.from_user.full_name} - начал запись VOSP")
     await state.clear()
     await state.set_state(Form.date)
     await state.update_data(user_name=find_user_name_by_id(message.from_user.id),
-                            user_role=find_user_role_by_id(message.from_user.id))
-    data = await state.get_data()
-    if data['user_role'] == 'Воспитатель':
-        await message.answer('Выберете дату', reply_markup=kb_date_all)
+                            user_role='Воспитатель')
+    await message.answer('Выберете дату', reply_markup=kb_date_all)
 
 
 @router.message(StateFilter(Form.date), Filter_data("user_role", "Воспитатель"))
@@ -106,20 +104,19 @@ async def step_3_reaction(message: Message, state: FSMContext):
         await message.answer("Некорректный  формат, пожалуйста введите еще раз два ЧИСЛА через пробел  в указанном формате", reply_markup=remove)
 
 
-@router.message(F.text == "Записать на ЭТУ ЖЕ дату", StateFilter("chose"))
+@router.message(F.text == "Записать на ЭТУ ЖЕ дату", StateFilter("chose"), FilterId(ID_VOSP))
 async def same_date_reaction_teacher(message: Message, state: FSMContext):
-    print(f"{message.from_user.id} - {message.from_user.full_name} - хочет записаться на ту же дату teacher")
+    print(f"{message.from_user.id} - {message.from_user.full_name} - хочет записаться на ту же дату VOSP")
     await rewrite_state_data(state, "same")
     data = await state.get_data()
-    if data["user_role"] == "Воспитатель":
-        kb = gen_keyboard_time_for_vosp(data["date"])
+    kb = gen_keyboard_time_for_vosp(data["date"])
     await message.answer("Выберете время", reply_markup=kb)
     await state.set_state(Form.time)
 
 
-@router.message(F.text == "Записать на ДРУГУЮ дату", StateFilter("chose"))
+@router.message(F.text == "Записать на ДРУГУЮ дату", StateFilter("chose"), FilterId(ID_VOSP))
 async def other_date_reaction_teacher(message: Message, state: FSMContext):
-    print(f"{message.from_user.id} - {message.from_user.full_name} - хочет записаться на другую дату teacher")
+    print(f"{message.from_user.id} - {message.from_user.full_name} - хочет записаться на другую дату VOSP")
     await rewrite_state_data(state, "other")
     data = await state.get_data()
     if data['user_role'] == 'Воспитатель':

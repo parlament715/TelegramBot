@@ -8,9 +8,8 @@ from app.database.table import get_png
 from aiogram.types import FSInputFile
 from loader import bot
 from app.users.filter_class import FilterId, Filter_data
-from app.users.objects_class import read_list, write_list
 from icecream import ic
-from app.users.objects_class import find_user_name_by_id, find_user_role_by_id, find_user_classroom_number_by_id
+from app.users.objects_class import find_user_name_by_id
 from app.users.main_class import Form
 from config import ADMIN
 router = Router()
