@@ -1,4 +1,5 @@
-from loader import bot, dp
+from loader import bot, dp, scheduler
+from app.scheduler.notifications import add_job_scheduler
 import asyncio
 import logging
 from app.users.handlers import admin
@@ -8,10 +9,15 @@ from app.users.handlers import main_vosp
 from app.users.handlers import other
 import sys
 from pathlib import Path
+from app.middelwares import CheckerSubscriptionsOnChannel, CheckerOnCallbackData
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
 async def main():
+    add_job_scheduler(scheduler)
+    scheduler.start()
+    dp.message.outer_middleware.register(CheckerSubscriptionsOnChannel())
+    dp.callback_query.outer_middleware.register(CheckerOnCallbackData())
     dp.include_router(vosp.router)
     dp.include_router(main_vosp.router)
     dp.include_router(teacher.router)

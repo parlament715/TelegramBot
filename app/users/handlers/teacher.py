@@ -1,6 +1,6 @@
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import CommandStart, StateFilter
-from app.keyboard import kb1, kb_time_for_teacher, kb_date_all, kb_date_for_teacher, kb4, remove, gen_keyboard_time_for_vosp, kb_check_other_date, kb5, kb6
+from app.keyboard import kb1, kb_time_for_teacher, kb_date_all, create_date_keyboard_for_teacher, kb4, remove, gen_keyboard_time_for_vosp, kb_check_other_date, kb5, kb6
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from app.database.request import to_write, check_on_exist, get_data_for_docx
@@ -27,22 +27,23 @@ async def second_keyboard_reaction(message: Message, state: FSMContext):
     await state.update_data(user_name=find_user_name_by_id(message.from_user.id),
                             user_role="Классный советник")
     data = await state.get_data()
-    await message.answer('Выберете дату', reply_markup=kb_date_for_teacher)
+    await message.answer('Выберете дату', reply_markup=create_date_keyboard_for_teacher())
 
 
-@router.message(StateFilter(Form.date), FilterId(ID_TEACHER))
-async def step_1_reaction(message: Message, state: FSMContext):
-    if message.text[0].isalpha():
-        message_text = message.text.split()[1]
+@router.callback_query(StateFilter(Form.date), FilterId(ID_TEACHER))
+async def step_1_reaction(call: CallbackQuery, state: FSMContext):
+    if call.data[0].isalpha():
+        message_text = call.data.split()[1]
     else:
-        message_text = message.text
+        message_text = call.data
     await state.update_data(date=message_text)
     data = await state.get_data()
     if "classroom_number" not in data.keys():
-        await state.update_data(classroom_number=find_user_classroom_number_by_id(message.from_user.id))
-    await message.answer("Выберете время", reply_markup=kb_time_for_teacher)
+        await state.update_data(classroom_number=find_user_classroom_number_by_id(call.from_user.id))
+    await call.message.answer("Выберете время", reply_markup=kb_time_for_teacher)
     # await send_time()
     await state.set_state(Form.time)
+    await call.answer()
 
 
 @router.message(StateFilter(Form.time), Filter_data("user_role", "Классный советник"))
