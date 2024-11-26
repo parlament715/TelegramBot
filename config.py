@@ -19,6 +19,3 @@ time_to = time(int(_TIME.split(";")[1].split(
     ":")[0]), int(_TIME.split(";")[1].split(":")[1]))
 
 print(time_from, time_to)
-
-
-today = datetime.now().date() + timedelta(days=0)

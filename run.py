@@ -2,7 +2,6 @@ from loader import bot, dp, scheduler
 from app.scheduler.notifications import add_job_scheduler
 import asyncio
 import logging
-from app.users.handlers import admin
 from app.users.handlers import teacher
 from app.users.handlers import vosp
 from app.users.handlers import main_vosp
@@ -21,7 +20,6 @@ async def main():
     dp.include_router(vosp.router)
     dp.include_router(main_vosp.router)
     dp.include_router(teacher.router)
-    dp.include_router(admin.router)
     dp.include_router(other.router)
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)

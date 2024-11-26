@@ -1,7 +1,7 @@
 from aiogram import BaseMiddleware
 from aiogram import types
 from typing import Callable, Dict, Any, Awaitable, Union
-from config import today, time_from, time_to
+from config import time_from, time_to
 from app.users.objects_class import ID_MAIN_VOSP, ID_TEACHER, ID_VOSP
 from datetime import datetime
 from loader import bot

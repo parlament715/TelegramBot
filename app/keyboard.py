@@ -2,19 +2,22 @@ from aiogram.types import ReplyKeyboardMarkup, ReplyKeyboardRemove
 from aiogram.types import KeyboardButton as KButton
 from aiogram.types import InlineKeyboardMarkup as InlKB
 from aiogram.types import InlineKeyboardButton as InKButton
-from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 import datetime
+from icecream import ic
 
-from config import today
 
+def create_main_vosp_date_keyboard():
+    ic(datetime.datetime.now())
+    today = datetime.datetime.now().date()
+    kb_date_all = ReplyKeyboardMarkup(
+        resize_keyboard=True, keyboard=[[KButton(text=f'Сегодня {str(today)}')],
+                                        [KButton(
+                                            text=f'Завтра {str(today +datetime.timedelta(days = 1))}')],
+                                        [KButton(
+                                            text=f'Послезавтра {str(today +datetime.timedelta(days= 2))}')]])
 
-async def create_main_vosp_date_keyboard():
-    builder = InlineKeyboardBuilder()
-    for i in range(7):
-        builder.button(
-            text=weekday_date(today + datetime.timedelta(days=i)), callback_data=f"date_{today +datetime.timedelta(days=i)}")
-    builder.adjust(1, repeat=True)
-    return builder.as_markup()
+    return kb_date_all
 
 
 def weekday_date(datetime_object: datetime) -> str:
@@ -75,42 +78,14 @@ kb1 = ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[[KButton(text='Я ст
                                                               text='Я воспитатель')],
                                                           [KButton(text='Я классный советник')]])
 
-
-keyboard_0x000 = [[KButton(text=f'Сегодня {str(today)}')],
-                  [KButton(
-                      text=f'Завтра {str(today +datetime.timedelta(days = 1))}')],
-                  [KButton(
-                      text=f'Послезавтра {str(today +datetime.timedelta(days= 2))}')]
-                  ]
-
-if today.weekday() >= 4:
-    if today.weekday() == 4:
-        keyboard_0x002 = [[KButton(text=f'Сегодня {str(today)}')],
-                          [KButton(
-                              text=f'Завтра {str(today +datetime.timedelta(days = 1))}')],
-                          ]
-    elif today.weekday() == 5:
-        keyboard_0x002 = [[KButton(text=f'Сегодня {str(today)}')],
-                          [KButton(
-                              text=f'Послезавтра {str(today +datetime.timedelta(days= 2))}')],
-                          ]
-    elif today.weekday() == 6:
-        keyboard_0x002 = [[KButton(text=f'Завтра {str(today +datetime.timedelta(days = 1))}')],
-                          [KButton(
-                              text=f'Послезавтра {str(today +datetime.timedelta(days= 2))}')]
-                          ]
-else:
-    keyboard_0x002 = keyboard_0x000
-
-
-kb_date_all = ReplyKeyboardMarkup(
-    resize_keyboard=True, keyboard=keyboard_0x000)
-
-kb_date_for_teacher = ReplyKeyboardMarkup(
-    resize_keyboard=True, keyboard=keyboard_0x002)
-
 kb_check_other_date = ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
                                           [KButton(text='Посмотреть другую дату')]])
+
+kb_time_for_teacher = ReplyKeyboardMarkup(
+    resize_keyboard=True, keyboard=[[KButton(text='Завтрак')],
+                                    [KButton(text='Обед')],
+                                    [KButton(text='Полдник')]
+                                    ])
 
 
 def gen_keyboard_time_for_vosp(date: str) -> ReplyKeyboardMarkup:
@@ -129,27 +104,17 @@ def gen_keyboard_time_for_vosp(date: str) -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(resize_keyboard=True, keyboard=keyboard_0x002)
 
 
-keyboard_0x001 = [[KButton(text='Завтрак')],
-                  [KButton(text='Обед')],
-                  [KButton(text='Полдник')]
-                  ]
+kb5 = ReplyKeyboardMarkup(resize_keyboard=True,
+                          keyboard=[[KButton(text='Записать на ЭТУ ЖЕ дату')],
+                                    [KButton(text="Записать на ДРУГУЮ дату")]])
 
-kb_time_for_teacher = ReplyKeyboardMarkup(
-    resize_keyboard=True, keyboard=keyboard_0x001)
+remove = ReplyKeyboardRemove()
 
+kb6 = ReplyKeyboardMarkup(resize_keyboard=True,
+                          keyboard=[[KButton(text='10')],
+                                    [KButton(text="11")]])
 
 kb4 = InlKB(inline_keyboard=[
     [InKButton(text="Да", callback_data="Yes"),
      InKButton(text="Нет", callback_data="No")]
 ])
-
-
-remove = ReplyKeyboardRemove()
-
-kb5 = ReplyKeyboardMarkup(resize_keyboard=True,
-                          keyboard=[[KButton(text='Записать на ЭТУ ЖЕ дату')],
-                                    [KButton(text="Записать на ДРУГУЮ дату")]])
-
-kb6 = ReplyKeyboardMarkup(resize_keyboard=True,
-                          keyboard=[[KButton(text='10')],
-                                    [KButton(text="11")]])

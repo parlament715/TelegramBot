@@ -1,6 +1,6 @@
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import CommandStart, StateFilter
-from app.keyboard import kb1, kb_time_for_teacher, kb_date_all, kb_date_for_teacher, kb4, remove, gen_keyboard_time_for_vosp, kb_check_other_date, kb5, kb6, create_main_vosp_date_keyboard
+from app.keyboard import kb1, kb4, remove, kb5, kb6, create_main_vosp_date_keyboard, kb_check_other_date
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from app.database.request import to_write, check_on_exist, get_data_for_docx
@@ -20,14 +20,7 @@ router = Router()
 @router.message(CommandStart(), FilterId(ID_MAIN_VOSP))
 async def first_keyboard_reaction(message: Message, state: FSMContext):
     await state.clear()
-    await message.answer('Для просмотра данных нажмите на предложенные варианты или введите их самостоятельно в таком формате : год-месяц-число.', reply_markup=kb_date_all)
-
-    await state.set_state("give_data")
-
-
-@router.message(F.text == "Посмотреть другую дату", FilterId(ADMIN))
-async def first_keyboard_reaction(message: Message, state: FSMContext):
-    await message.answer('Для просмотра данных нажмите на предложенные варианты или введите их самостоятельно в таком формате : год-месяц-число.', reply_markup=kb_date_all)
+    await message.answer('Для просмотра данных нажмите на предложенные варианты или введите их самостоятельно в таком формате : год-месяц-число.', reply_markup=create_main_vosp_date_keyboard())
 
     await state.set_state("give_data")
 
@@ -58,15 +51,3 @@ async def state_give_data_reaction(message: Message, state: FSMContext):
         await bot.send_document(chat_id=message.chat.id, document=file)
     else:
         await message.answer("Не получилось сформировать документ, недостаточно записей")
-
-
-@router.message(F.text == "/admin")
-async def send_main_vosp_panel(message: Message, state: FSMContext):
-    await message.answer("Выберете дату", reply_markup=await create_main_vosp_date_keyboard())
-
-    await state.set_state("select_date")
-
-
-@router.callback_query(StateFilter("select_date"), F.data.startswith("date_"))
-async def select_date(call: CallbackQuery, state: FSMContext):
-    print(call.data)
