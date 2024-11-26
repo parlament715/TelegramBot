@@ -13,9 +13,9 @@ def create_main_vosp_date_keyboard():
     kb_date_all = ReplyKeyboardMarkup(
         resize_keyboard=True, keyboard=[[KButton(text=f'Сегодня {str(today)}')],
                                         [KButton(
-                                            text=f'Завтра {str(today +datetime.timedelta(days = 1))}')],
+                                            text=f'Завтра {str(today + datetime.timedelta(days=1))}')],
                                         [KButton(
-                                            text=f'Послезавтра {str(today +datetime.timedelta(days= 2))}')]])
+                                            text=f'Послезавтра {str(today + datetime.timedelta(days=2))}')]])
 
     return kb_date_all
 

@@ -1,5 +1,4 @@
-from loader import bot, dp, scheduler
-from app.scheduler.notifications import add_job_scheduler
+from loader import bot, dp
 import asyncio
 import logging
 from app.users.handlers import teacher
@@ -8,7 +7,6 @@ from app.users.handlers import main_vosp
 from app.users.handlers import other
 import sys
 from pathlib import Path
-from app.middelwares import CheckerSubscriptionsOnChannel, CheckerOnCallbackData
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
