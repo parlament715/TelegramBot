@@ -1,6 +1,8 @@
-from loader import bot, dp
+from loader import bot, dp, scheduler
+from app.scheduler.notifications import add_job_scheduler
 import asyncio
 import logging
+from app.middelwares import CheckerOnCallbackData, CheckerSubscriptionsOnChannel
 from app.users.handlers import teacher
 from app.users.handlers import vosp
 from app.users.handlers import main_vosp
