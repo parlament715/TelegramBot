@@ -138,5 +138,5 @@ async def other_date_reaction_teacher(message: Message, state: FSMContext):
     print(f"{message.from_user.id} - {message.from_user.full_name} - хочет записаться на другую дату teacher")
     await rewrite_state_data(state, "other")
     data = await state.get_data()
-    await message.answer('Выберете дату', reply_markup=kb_date_for_teacher)
+    await message.answer('Выберете дату', reply_markup=create_date_keyboard_for_teacher())
     await state.set_state(Form.date)
