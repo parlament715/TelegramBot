@@ -12,23 +12,23 @@ def to_create(date):
 
     cursor = conn.cursor()
 
-    cursor.execute(f'''CREATE TABLE IF NOT EXISTS "{date}" 
+    cursor.execute(f'''CREATE TABLE IF NOT EXISTS "{date}"
                     (who TEXT,
                     breakfast_dorm_11 INTEGER,
                     breakfast_dorm_10 INTEGER,
                     breakfast_city_11 INTEGER,
-                    breakfast_city_10 INTEGER, 
+                    breakfast_city_10 INTEGER,
                     lunch_dorm_11 INTEGER,
                     lunch_dorm_10 INTEGER,
                     lunch_city_11 INTEGER,
-                    lunch_city_10 INTEGER, 
+                    lunch_city_10 INTEGER,
                     snack_dorm_11 INTEGER,
                     snack_dorm_10 INTEGER,
                     snack_city_11 INTEGER,
                     snack_city_10 INTEGER,
                     dinner_dorm_11 INTEGER,
                     dinner_dorm_10 INTEGER,
-                    class_num INTEGER, 
+                    class_num INTEGER,
                     role TEXT)
                     ''')
 
@@ -49,9 +49,9 @@ def to_write(my_dict: dict):
         res = cursor.execute(
             f''' SELECT {column_name} FROM "{str(my_date)}" WHERE who = "{name}" ''').fetchone()
         if res == None:
-            cursor.execute(f''' 
-                        INSERT INTO "{str(my_date)}" 
-                        (who, role, {column_name},class_num) VALUES 
+            cursor.execute(f'''
+                        INSERT INTO "{str(my_date)}"
+                        (who, role, {column_name},class_num) VALUES
                         ("{name}","{role}",{num},{class_num})
                             ''')  # если записи ещё не было то добавляем
         else:
@@ -78,12 +78,12 @@ def from_dict_to_name_column(dict: dict) -> list:
         "Завтрак Воспитатель 10": "breakfast_dorm_10",
         "Обед Классный советник 11": "lunch_city_11",
         "Обед Классный советник 10": "lunch_city_10",
-        "Обед Классный советник 11 dorm": "lunch_dorm_11",
-        "Обед Классный советник 10 dorm": "lunch_dorm_10",
+        "Обед Воспитатель 11": "lunch_dorm_11",
+        "Обед Воспитатель 10": "lunch_dorm_10",
         "Полдник Классный советник 11": "snack_city_11",
         "Полдник Классный советник 10": "snack_city_10",
-        "Полдник Классный советник 11 dorm": "snack_dorm_11",
-        "Полдник Классный советник 10 dorm": "snack_dorm_10",
+        "Полдник Воспитатель 11": "snack_dorm_11",
+        "Полдник Воспитатель 10": "snack_dorm_10",
         "Ужин Воспитатель 11": "dinner_dorm_11",
         "Ужин Воспитатель 10": "dinner_dorm_10",
 
@@ -103,6 +103,8 @@ def from_dict_to_name_column(dict: dict) -> list:
         listik.append(column_name)
         # to_to_write(my_date,column_name,name,class_num,num.split()[1])
     elif role == "Воспитатель":
+        print(column_names[_column_name + ' 11'], _column_name + ' 11')
+        print(column_names[_column_name + ' 10'], _column_name + ' 10')
         listik.append(column_names[_column_name + ' 11'])
         listik.append(column_names[_column_name + ' 10'])
     return listik

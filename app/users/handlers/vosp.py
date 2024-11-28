@@ -121,5 +121,5 @@ async def other_date_reaction_teacher(message: Message, state: FSMContext):
     await rewrite_state_data(state, "other")
     data = await state.get_data()
     if data['user_role'] == 'Воспитатель':
-        await message.answer('Выберете дату', reply_markup=kb_date_all)
+        await message.answer('Выберете дату', reply_markup=create_date_keyboard_for_vosp())
     await state.set_state(Form.date)
