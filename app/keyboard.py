@@ -42,7 +42,7 @@ def create_date_keyboard_for_vosp() -> InlKB:
     weekdays = {
         1: ["Четверг " + str(date + datetime.timedelta(2))],
         2: ["Пятница " + str(date + datetime.timedelta(2))],
-        3: ["Суббота " + str(datetime.timedelta(2)),
+        3: ["Суббота " + str(date + datetime.timedelta(2)),
             "Воскресенье " + str(date + datetime.timedelta(3)),
             "Понедельник " + str(date + datetime.timedelta(4))],
         4: ["Вторник " + str(date + datetime.timedelta(2))],
@@ -51,6 +51,7 @@ def create_date_keyboard_for_vosp() -> InlKB:
     builder = InlineKeyboardBuilder()
     for elem in weekdays[weekday]:
         builder.button(text=elem, callback_data=elem.split()[-1])
+    builder.adjust(1)
     return builder.as_markup()
 
 
@@ -62,7 +63,7 @@ def create_date_keyboard_for_teacher() -> InlKB:
     weekdays = {
         1: ["Четверг " + str(date + datetime.timedelta(2))],
         2: ["Пятница " + str(date + datetime.timedelta(2))],
-        3: ["Суббота " + str(datetime.timedelta(2)),
+        3: ["Суббота " + str(date + datetime.timedelta(2)),
             "Понедельник " + str(date + datetime.timedelta(4))],
         4: ["Вторник " + str(date + datetime.timedelta(2))],
         5: ["Среда " + str(date + datetime.timedelta(2))],
@@ -70,6 +71,7 @@ def create_date_keyboard_for_teacher() -> InlKB:
     builder = InlineKeyboardBuilder()
     for elem in weekdays[weekday]:
         builder.button(text=elem, callback_data=elem.split()[-1])
+    builder.adjust(1)
     return builder.as_markup()
 
 
