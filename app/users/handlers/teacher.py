@@ -113,13 +113,10 @@ async def call_back_data_reaction_Yes(call: CallbackQuery, state: FSMContext):
     await call.message.delete()
     await call.answer()
     data = await state.get_data()
-    if data["user_role"] == "Классный советник":
-        if data["time"] == "Завтрак":
-            await call.message.answer("Сколько человек (Напишите числом)")
-        elif data["time"] in ("Обед", "Полдник"):
-            await call.message.answer('Сколько человек (количество городских, через пробел количество интернатных)')
-    elif data["user_role"] == "Воспитатель":
-        await call.message.answer('Сколько человек (количество 11-классников, через пробел количество 10-классников)')
+    if data["time"] == "Завтрак":
+        await call.message.answer("Сколько человек (Напишите числом)")
+    elif data["time"] in ("Обед", "Полдник"):
+        await call.message.answer('Сколько человек (количество городских, через пробел количество интернатных)')
     await state.set_state(Form.num)
 
 

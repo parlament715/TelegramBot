@@ -14,21 +14,13 @@ def to_create(date):
 
     cursor.execute(f'''CREATE TABLE IF NOT EXISTS "{date}"
                     (who TEXT,
-                    breakfast_dorm_11 INTEGER,
-                    breakfast_dorm_10 INTEGER,
-                    breakfast_city_11 INTEGER,
-                    breakfast_city_10 INTEGER,
-                    lunch_dorm_11 INTEGER,
-                    lunch_dorm_10 INTEGER,
-                    lunch_city_11 INTEGER,
-                    lunch_city_10 INTEGER,
-                    snack_dorm_11 INTEGER,
-                    snack_dorm_10 INTEGER,
-                    snack_city_11 INTEGER,
-                    snack_city_10 INTEGER,
-                    dinner_dorm_11 INTEGER,
-                    dinner_dorm_10 INTEGER,
-                    class_num INTEGER,
+                    breakfast_dorm INTEGER,
+                    breakfast_city INTEGER,
+                    lunch_dorm INTEGER,
+                    lunch_city INTEGER,
+                    snack_dorm INTEGER,
+                    snack_city INTEGER,
+                    dinner_dorm INTEGER,
                     role TEXT)
                     ''')
 
@@ -38,10 +30,6 @@ def to_write(my_dict: dict):
     role = my_dict["user_role"]
     my_date = my_dict['date']
     ic(name, role, my_date, my_dict.keys(), my_dict)
-    if "classroom_number" in my_dict.keys():
-        class_num = my_dict["classroom_number"]
-    else:
-        class_num = "Null"
     num_list = my_dict["num"].split()
     to_create(str(my_date))
     for (index, column_name) in enumerate(from_dict_to_name_column(my_dict)):
@@ -51,8 +39,8 @@ def to_write(my_dict: dict):
         if res == None:
             cursor.execute(f'''
                         INSERT INTO "{str(my_date)}"
-                        (who, role, {column_name},class_num) VALUES
-                        ("{name}","{role}",{num},{class_num})
+                        (who, role, {column_name}) VALUES
+                        ("{name}","{role}",{num})
                             ''')  # если записи ещё не было то добавляем
         else:
             cursor.execute(
@@ -65,36 +53,22 @@ def from_dict_to_name_column(dict: dict) -> list:
     listik = []  # приводим в порядок данные перед записью
     time = dict["time"]
     role = dict["user_role"]
-    if role == "Классный советник":
-        class_num = dict["classroom_number"]
-    else:
-        class_num = "None"
-    print(class_num)
     ic(dict)
     column_names = {
-        "Завтрак Классный советник 11": "breakfast_city_11",
-        "Завтрак Классный советник 10": "breakfast_city_10",
-        "Завтрак Воспитатель 11": "breakfast_dorm_11",
-        "Завтрак Воспитатель 10": "breakfast_dorm_10",
-        "Обед Классный советник 11": "lunch_city_11",
-        "Обед Классный советник 10": "lunch_city_10",
-        "Обед Воспитатель 11": "lunch_dorm_11",
-        "Обед Воспитатель 10": "lunch_dorm_10",
-        "Полдник Классный советник 11": "snack_city_11",
-        "Полдник Классный советник 10": "snack_city_10",
-        "Полдник Воспитатель 11": "snack_dorm_11",
-        "Полдник Воспитатель 10": "snack_dorm_10",
-        "Ужин Воспитатель 11": "dinner_dorm_11",
-        "Ужин Воспитатель 10": "dinner_dorm_10",
-
+        "Завтрак Классный советник": "breakfast_city",
+        "Завтрак Воспитатель": "breakfast_dorm",
+        "Обед Классный советник": "lunch_city",
+        "Обед Воспитатель": "lunch_dorm",
+        "Полдник Классный советник": "snack_city",
+        "Полдник Воспитатель": "snack_dorm",
+        "Ужин Воспитатель": "dinner_dorm",
     }
+    ic(time, role)
     _column_name = time + " " + role
     if role == 'Классный советник' and time == 'Завтрак':
-        _column_name += f' {str(class_num)}'
         column_name = column_names[_column_name]
         listik.append(column_name)
     elif role == "Классный советник" and (time == "Обед" or time == "Полдник"):
-        _column_name += f' {str(class_num)}'
         column_name = column_names[_column_name]
         listik.append(column_name)
         # to_to_write(my_date,column_name,name,class_num,num.split()[0])
@@ -103,10 +77,8 @@ def from_dict_to_name_column(dict: dict) -> list:
         listik.append(column_name)
         # to_to_write(my_date,column_name,name,class_num,num.split()[1])
     elif role == "Воспитатель":
-        print(column_names[_column_name + ' 11'], _column_name + ' 11')
-        print(column_names[_column_name + ' 10'], _column_name + ' 10')
-        listik.append(column_names[_column_name + ' 11'])
-        listik.append(column_names[_column_name + ' 10'])
+        listik.append(column_names[_column_name])
+        listik.append(column_names[_column_name])
     return listik
 
 
@@ -132,6 +104,7 @@ def check_on_exist(my_dict: dict) -> Union[list, None]:
     res = []
 
     to_create(my_date)
+    ic(from_dict_to_name_column(my_dict), my_dict)
     for time in from_dict_to_name_column(my_dict):
         a = cursor.execute(
             f''' SELECT {time} FROM "{str(my_date)}" WHERE who = "{name}"''').fetchone()
