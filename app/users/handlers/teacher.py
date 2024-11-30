@@ -1,6 +1,6 @@
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import CommandStart, StateFilter
-from app.keyboard import kb1, kb_time_for_teacher, create_date_keyboard_for_teacher, kb4, remove, gen_keyboard_time_for_vosp, kb_check_other_date, kb5, kb6
+from app.keyboard import gen_keyboard_time_for_teacher, create_date_keyboard_for_teacher, yes_no_keyboard, remove, kb_check_other_date, kb5
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from app.database.request import to_write, check_on_exist, get_data_for_docx
@@ -27,7 +27,7 @@ async def second_keyboard_reaction(message: Message, state: FSMContext):
     await state.update_data(user_name=find_user_name_by_id(message.from_user.id),
                             user_role="Классный советник")
     data = await state.get_data()
-    keyboard = create_date_keyboard_for_vosp()
+    keyboard = create_date_keyboard_for_teacher()
     if keyboard:
         await message.answer('Выберете дату', reply_markup=keyboard)
         await state.set_state(Form.date)
@@ -43,29 +43,30 @@ async def step_1_reaction(call: CallbackQuery, state: FSMContext):
         message_text = call.data
     await state.update_data(date=message_text)
     data = await state.get_data()
-    await call.message.answer("Выберете время", reply_markup=kb_time_for_teacher)
+    await call.message.answer("Выберете время", reply_markup=gen_keyboard_time_for_teacher(data))
     # await send_time()
     await state.set_state(Form.time)
     await call.answer()
 
 
-@router.message(StateFilter(Form.time), Filter_data("user_role", "Классный советник"))
-async def step_2_reaction(message: Message, state: FSMContext):
-    await state.update_data(time=message.text)
+@router.callback_query(StateFilter(Form.time), Filter_data("user_role", "Классный советник"))
+async def step_2_reaction(call: CallbackQuery, state: FSMContext):
+    await state.update_data(time=call.data)
     data = await state.get_data()
     res = check_on_exist(data)
     if res == None:
-        if message.text == "Обед" or message.text == "Полдник":
-            await message.answer('Сколько человек (количество городских, через пробел количество интернатных)', reply_markup=remove)
+        if call.data == "Обед" or call.data == "Полдник":
+            await call.message.answer('Сколько человек (количество городских, через пробел количество интернатных)', reply_markup=remove)
         else:
-            await message.answer("Сколько человек (Напишите числом)", reply_markup=remove)
+            await call.message.answer("Сколько человек (Напишите числом)", reply_markup=remove)
         await state.set_state(Form.num)
     else:
         await state.set_state("already exist")
         if data["time"] == "Завтрак":
-            await message.answer(f'Эта запись уже существует "{res[0]}" \nВы хотите её заменить?', reply_markup=kb4)
+            await call.message.answer(f'Эта запись уже существует "{res[0]}" \nВы хотите её заменить?', reply_markup=yes_no_keyboard)
         if data["time"] == "Полдник" or data["time"] == "Обед":
-            await message.answer(f'Эта запись уже существует : \nгород : {res[0]}\nинтернат : {res[1]} \nВы хотите её заменить?', reply_markup=kb4)
+            await call.message.answer(f'Эта запись уже существует : \nгород : {res[0]}\nинтернат : {res[1]} \nВы хотите её заменить?', reply_markup=yes_no_keyboard)
+    await call.answer()
 
 
 @router.message(StateFilter(Form.num), Filter_data("user_role", "Классный советник"))
@@ -128,7 +129,7 @@ async def same_date_reaction_teacher(message: Message, state: FSMContext):
     print(f"{message.from_user.id} - {message.from_user.full_name} - хочет записаться на ту же дату teacher")
     await rewrite_state_data(state, "same")
     data = await state.get_data()
-    kb = kb_time_for_teacher
+    kb = gen_keyboard_time_for_teacher(data)
     await message.answer("Выберете время", reply_markup=kb)
     await state.set_state(Form.time)
 

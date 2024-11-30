@@ -99,16 +99,13 @@ def check_on_exist(my_dict: dict) -> Union[list, None]:
     name = my_dict["user_name"]
     my_date = my_dict["date"]
     time = my_dict["time"]
-    role = my_dict["user_role"]
     res = []
     to_create(my_date)
     # ic(from_dict_to_name_column(my_dict), my_dict)
     for time in from_dict_to_name_column(my_dict):
         a = cursor.execute(
             f''' SELECT {time} FROM "{str(my_date)}" WHERE who = "{name}"''').fetchone()
-        ic(f''' SELECT {time} FROM "{str(my_date)}" WHERE who = "{name}"''')
         if a != None and a != (None,):
-            ic(a)
             res.append(a[0])
 
     if res != []:

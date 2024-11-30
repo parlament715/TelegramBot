@@ -1,6 +1,6 @@
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import CommandStart, StateFilter
-from app.keyboard import kb1, create_date_keyboard_for_vosp, kb4, remove, gen_keyboard_time_for_vosp, kb_check_other_date, kb5, kb6
+from app.keyboard import create_date_keyboard_for_vosp, yes_no_keyboard, remove, gen_keyboard_time_for_vosp, kb_check_other_date, kb5
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from app.database.request import to_write, check_on_exist, get_data_for_docx
@@ -66,25 +66,25 @@ async def step_1_reaction(call: CallbackQuery, state: FSMContext):
         message_text = call.data
     await state.update_data(date=message_text)
     data = await state.get_data()
-    kb = gen_keyboard_time_for_vosp(data["date"])
-    await call.message.answer("Выберете время", reply_markup=kb)
+    await call.message.answer("Выберете время", reply_markup=gen_keyboard_time_for_vosp(data))
     # await send_time()
     await state.set_state(Form.time)
     await call.answer()
 
 
-@router.message(StateFilter(Form.time), Filter_data("user_role", "Воспитатель"))
-async def step_2_reaction(message: Message, state: FSMContext):
-    print(f"{message.from_user.id} - {message.from_user.full_name} - выбрал время vosp")
-    await state.update_data(time=message.text)
+@router.callback_query(StateFilter(Form.time), Filter_data("user_role", "Воспитатель"))
+async def step_2_reaction(call: CallbackQuery, state: FSMContext):
+    print(f"{call.from_user.id} - {call.from_user.full_name} - выбрал время vosp")
+    await state.update_data(time=call.data)
     data = await state.get_data()
     res = check_on_exist(data)
     if res == None:
-        await message.answer('Сколько человек (и 11 классников и 10 классников в сумме)', reply_markup=remove)
+        await call.message.answer('Сколько человек (и 11 классников и 10 классников в сумме)', reply_markup=remove)
         await state.set_state(Form.num)
     else:
         await state.set_state("already exist")
-        await message.answer(f'Эта запись уже существует : {res[0]}\nВы хотите её заменить?', reply_markup=kb4)
+        await call.message.answer(f'Эта запись уже существует : {res[0]}\nВы хотите её заменить?', reply_markup=yes_no_keyboard)
+    await call.answer()
 
 
 @router.message(StateFilter(Form.num), Filter_data("user_role", "Воспитатель"))
@@ -113,7 +113,7 @@ async def same_date_reaction_teacher(message: Message, state: FSMContext):
     print(f"{message.from_user.id} - {message.from_user.full_name} - хочет записаться на ту же дату VOSP")
     await rewrite_state_data(state, "same")
     data = await state.get_data()
-    kb = gen_keyboard_time_for_vosp(data["date"])
+    kb = gen_keyboard_time_for_vosp(data)
     await message.answer("Выберете время", reply_markup=kb)
     await state.set_state(Form.time)
 

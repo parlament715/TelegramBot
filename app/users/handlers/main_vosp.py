@@ -1,6 +1,6 @@
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import CommandStart, StateFilter
-from app.keyboard import kb1, kb4, remove, kb5, kb6, create_main_vosp_date_keyboard, kb_check_other_date
+from app.keyboard import yes_no_keyboard, remove, create_main_vosp_date_keyboard, kb_check_other_date
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from app.database.request import to_write, check_on_exist, get_data_for_docx
