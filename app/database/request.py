@@ -29,10 +29,8 @@ def to_write(my_dict: dict):
     name = my_dict["user_name"]
     role = my_dict["user_role"]
     my_date = my_dict['date']
-    ic(name, role, my_date, my_dict.keys(), my_dict)
     num = my_dict["num"].split()
     to_create(str(my_date))
-    ic(from_dict_to_name_column(my_dict), my_dict)
     for (index, column_name) in enumerate(from_dict_to_name_column(my_dict)):
         res = cursor.execute(
             f''' SELECT {column_name} FROM "{str(my_date)}" WHERE who = "{name}" ''').fetchone()
@@ -109,7 +107,6 @@ def check_on_exist(my_dict: dict) -> Union[list, None]:
             res.append(a[0])
 
     if res != []:
-        ic(res)
         return res
     return None
 

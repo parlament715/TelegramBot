@@ -1,4 +1,4 @@
-from aiogram.types import ReplyKeyboardMarkup, ReplyKeyboardRemove
+from aiogram.types import ReplyKeyboardMarkup, ReplyKeyboardRemove, CallbackQuery
 from aiogram.types import KeyboardButton as KButton
 from aiogram.types import InlineKeyboardMarkup as InlKB
 from aiogram.types import InlineKeyboardButton as InKButton
@@ -34,7 +34,7 @@ def weekday_date(datetime_object: datetime) -> str:
     return weekday_str + datetime_object.strftime(" %d.%m.%Y")
 
 
-def create_date_keyboard_for_vosp() -> InlKB:
+def create_date_keyboard_for_vosp(my_dict: dict) -> InlKB:
     date = datetime.datetime.now().date()
     weekday = date.weekday()
     if not (1 <= weekday <= 5):
@@ -50,12 +50,13 @@ def create_date_keyboard_for_vosp() -> InlKB:
     }
     builder = InlineKeyboardBuilder()
     for elem in weekdays[weekday]:
-        builder.button(text=elem, callback_data=elem.split()[-1])
+        builder.button(text=is_full_day(my_dict, elem.split()[-1]) + elem,
+                       callback_data=elem.split()[-1])
     builder.adjust(1)
     return builder.as_markup()
 
 
-def create_date_keyboard_for_teacher() -> InlKB:
+def create_date_keyboard_for_teacher(my_dict: dict) -> InlKB:
     date = datetime.datetime.now().date()
     weekday = date.weekday()
     if not (1 <= weekday <= 5):
@@ -70,7 +71,8 @@ def create_date_keyboard_for_teacher() -> InlKB:
     }
     builder = InlineKeyboardBuilder()
     for elem in weekdays[weekday]:
-        builder.button(text=elem, callback_data=elem.split()[-1])
+        builder.button(text=is_full_day(my_dict, elem.split()
+                       [-1]) + elem, callback_data=elem.split()[-1])
     builder.adjust(1)
     return builder.as_markup()
 
@@ -79,7 +81,7 @@ kb_check_other_date = ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
                                           [KButton(text='Посмотреть другую дату')]])
 
 
-def gen_keyboard_time_for_teacher(my_dict):
+def gen_keyboard_time_for_teacher(my_dict: dict) -> InlKB:
     kb_time_for_teacher = InlKB(inline_keyboard=[[InKButton(text=is_full_time(my_dict, "Завтрак") + 'Завтрак',                        callback_data="Завтрак")],
                                                  [InKButton(
                                                      text=is_full_time(my_dict, "Обед") + 'Обед', callback_data="Обед")],
@@ -109,6 +111,25 @@ def gen_keyboard_time_for_vosp(my_dict: dict) -> InlKB:
     return InlKB(inline_keyboard=keyboard_0x002)
 
 
+def is_full_day(my_dict: dict, date: str) -> str:
+    date_obj = datetime.datetime.strptime(date, '%Y-%m-%d')
+    my_dict["date"] = date
+    if my_dict["user_role"] == "Воспитатель":
+        if date_obj.weekday() == 6:
+            listik = ['Завтрак', 'Обед', 'Полдник', 'Ужин']
+        else:
+            listik = ["Завтрак", "Ужин"]
+    elif my_dict["user_role"] == "Классный советник":
+        listik = ["Завтрак", "Обед", "Полдник"]
+    else:
+        raise Exception("user_role must be Классный советник or Воспитатель")
+    request.to_create(my_dict["date"])
+    for time in listik:
+        if is_full_time(my_dict, time) == "":
+            return ""
+    return "♻️ "
+
+
 def is_full_time(my_dict: dict, time: str) -> str:
     date = my_dict["date"]
     name = my_dict["user_name"]
@@ -130,3 +151,29 @@ yes_no_keyboard = InlKB(inline_keyboard=[
     [InKButton(text="Да", callback_data="Yes"),
      InKButton(text="Нет", callback_data="No")]
 ])
+
+
+def flatten(nested_list):
+    """Уплощает вложенный список."""
+    flat_list = []
+    for item in nested_list:
+        if isinstance(item, list):
+            # Рекурсивный вызов для вложенных списков
+            flat_list.extend(flatten(item))
+        else:
+            flat_list.append(item)
+    return flat_list
+
+
+def take_changed_keyboard(keyboard: InlKB, call_data: CallbackQuery) -> InlKB:
+    listik = []
+    keyboard = flatten(keyboard.inline_keyboard)
+    builder = InlineKeyboardBuilder()
+    for elem in keyboard:
+        if elem.callback_data == call_data:
+            builder.button(text=elem.text + " ✅",
+                           callback_data=elem.callback_data)
+        else:
+            builder.add(elem)
+    builder.adjust(1)
+    return builder.as_markup()

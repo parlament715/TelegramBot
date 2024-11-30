@@ -14,6 +14,7 @@ from app.users.objects_class import find_user_name_by_id, find_user_classroom_nu
 from app.users.main_class import Form
 from config import ADMIN
 from app.users.handlers.other import rewrite_state_data
+from app.decorators import dc_change_keyboard
 
 
 router = Router()
@@ -27,8 +28,9 @@ async def second_keyboard_reaction(message: Message, state: FSMContext):
     await state.update_data(user_name=find_user_name_by_id(message.from_user.id),
                             user_role="Классный советник")
     data = await state.get_data()
-    keyboard = create_date_keyboard_for_teacher()
+    keyboard = create_date_keyboard_for_teacher(data)
     if keyboard:
+        await state.update_data(last_kb=keyboard)
         await message.answer('Выберете дату', reply_markup=keyboard)
         await state.set_state(Form.date)
     else:
@@ -36,6 +38,7 @@ async def second_keyboard_reaction(message: Message, state: FSMContext):
 
 
 @router.callback_query(StateFilter(Form.date), FilterId(ID_TEACHER))
+@dc_change_keyboard(previous_name="call")
 async def step_1_reaction(call: CallbackQuery, state: FSMContext):
     if call.data[0].isalpha():
         message_text = call.data.split()[1]
@@ -43,13 +46,16 @@ async def step_1_reaction(call: CallbackQuery, state: FSMContext):
         message_text = call.data
     await state.update_data(date=message_text)
     data = await state.get_data()
-    await call.message.answer("Выберете время", reply_markup=gen_keyboard_time_for_teacher(data))
+    kb = gen_keyboard_time_for_teacher(data)
+    await state.update_data(last_kb=kb)
+    await call.message.answer("Выберете время", reply_markup=kb)
     # await send_time()
     await state.set_state(Form.time)
     await call.answer()
 
 
 @router.callback_query(StateFilter(Form.time), Filter_data("user_role", "Классный советник"))
+@dc_change_keyboard(previous_name="call")
 async def step_2_reaction(call: CallbackQuery, state: FSMContext):
     await state.update_data(time=call.data)
     data = await state.get_data()
@@ -130,6 +136,7 @@ async def same_date_reaction_teacher(message: Message, state: FSMContext):
     await rewrite_state_data(state, "same")
     data = await state.get_data()
     kb = gen_keyboard_time_for_teacher(data)
+    await state.update_data(last_kb=kb)
     await message.answer("Выберете время", reply_markup=kb)
     await state.set_state(Form.time)
 
@@ -139,5 +146,7 @@ async def other_date_reaction_teacher(message: Message, state: FSMContext):
     print(f"{message.from_user.id} - {message.from_user.full_name} - хочет записаться на другую дату teacher")
     await rewrite_state_data(state, "other")
     data = await state.get_data()
-    await message.answer('Выберете дату', reply_markup=create_date_keyboard_for_teacher())
+    kb = create_date_keyboard_for_teacher(data)
+    await state.update_data(last_kb=kb)
+    await message.answer('Выберете дату', reply_markup=kb)
     await state.set_state(Form.date)
