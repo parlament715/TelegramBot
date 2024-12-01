@@ -30,10 +30,10 @@ def to_write(my_dict: dict):
     role = my_dict["user_role"]
     my_date = my_dict['date']
     ic(name, role, my_date, my_dict.keys(), my_dict)
-    num_list = my_dict["num"].split()
+    num = my_dict["num"]
     to_create(str(my_date))
+    ic(from_dict_to_name_column(my_dict), my_dict)
     for (index, column_name) in enumerate(from_dict_to_name_column(my_dict)):
-        num = num_list[index]
         res = cursor.execute(
             f''' SELECT {column_name} FROM "{str(my_date)}" WHERE who = "{name}" ''').fetchone()
         if res == None:
@@ -58,8 +58,10 @@ def from_dict_to_name_column(dict: dict) -> list:
         "Завтрак Классный советник": "breakfast_city",
         "Завтрак Воспитатель": "breakfast_dorm",
         "Обед Классный советник": "lunch_city",
+        "Обед Классный советник dorm": "lunch_dorm",
         "Обед Воспитатель": "lunch_dorm",
         "Полдник Классный советник": "snack_city",
+        "Полдник Классный советник dorm": "snack_dorm",
         "Полдник Воспитатель": "snack_dorm",
         "Ужин Воспитатель": "dinner_dorm",
     }
@@ -77,7 +79,6 @@ def from_dict_to_name_column(dict: dict) -> list:
         listik.append(column_name)
         # to_to_write(my_date,column_name,name,class_num,num.split()[1])
     elif role == "Воспитатель":
-        listik.append(column_names[_column_name])
         listik.append(column_names[_column_name])
     return listik
 

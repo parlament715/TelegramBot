@@ -38,8 +38,6 @@ async def step_1_reaction(call: CallbackQuery, state: FSMContext):
         message_text = call.data
     await state.update_data(date=message_text)
     data = await state.get_data()
-    if "classroom_number" not in data.keys():
-        await state.update_data(classroom_number=find_user_classroom_number_by_id(call.from_user.id))
     await call.message.answer("Выберете время", reply_markup=kb_time_for_teacher)
     # await send_time()
     await state.set_state(Form.time)

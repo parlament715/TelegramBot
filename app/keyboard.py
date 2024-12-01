@@ -35,6 +35,7 @@ def weekday_date(datetime_object: datetime) -> str:
 
 
 def create_date_keyboard_for_vosp() -> InlKB:
+    print("alo2")
     date = datetime.datetime.now().date()
     weekday = date.weekday()
     if not (1 <= weekday <= 5):

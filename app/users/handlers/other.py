@@ -38,12 +38,7 @@ async def rewrite_state_data(state: FSMContext, param: str):
     date = data["date"]
     user_name = data["user_name"]
     user_role = data["user_role"]
-    if data["user_role"] == "Классный советник":
-        classroom_number = data["classroom_number"]
     await state.clear()
-    if data["user_role"] == "Классный советник":
-        await state.update_data(user_name=user_name, classroom_number=classroom_number, user_role=user_role)
-    elif data["user_role"] == "Воспитатель":
-        await state.update_data(user_name=user_name, user_role=user_role)
+    await state.update_data(user_name=user_name, user_role=user_role)
     if param == "same":
         await state.update_data(date=date)
