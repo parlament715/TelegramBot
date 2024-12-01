@@ -38,7 +38,7 @@ async def call_back_data_reaction_Yes(call: CallbackQuery, state: FSMContext):
         elif data["time"] in ("Обед", "Полдник"):
             await call.message.answer('Сколько человек (количество городских, через пробел количество интернатных)')
     elif data["user_role"] == "Воспитатель":
-        await call.message.answer('Сколько человек (количество 11-классников, через пробел количество 10-классников)')
+        await call.message.answer('Сколько человек (и 11 классников и 10 классников в сумме)')
     await state.set_state(Form.num)
 
 
@@ -80,7 +80,7 @@ async def step_2_reaction(message: Message, state: FSMContext):
         await state.set_state(Form.num)
     else:
         await state.set_state("already exist")
-        await message.answer(f'Эта запись уже существует : \n11 класс : {res[0]}\n10 класс : {res[1]} \nВы хотите её заменить?', reply_markup=kb4)
+        await message.answer(f'Эта запись уже существует : {res[0]}\nВы хотите её заменить?', reply_markup=kb4)
 
 
 @router.message(StateFilter(Form.num), Filter_data("user_role", "Воспитатель"))
