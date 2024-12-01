@@ -7,7 +7,6 @@ from icecream import ic
 dotenv.load_dotenv()
 
 BOT_TOKEN = (os.getenv('token'))
-ADMIN = json.loads((os.getenv('admin')))
 VOSP = json.loads(os.getenv("vosp"))
 TEACHER = json.loads(os.getenv("teacher"))
 MAIN_VOSP = json.loads(os.getenv("main_vosp"))

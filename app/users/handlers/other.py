@@ -12,7 +12,6 @@ from icecream import ic
 from app.users.objects_class import ID_TEACHER, ID_VOSP, ID_MAIN_VOSP
 from app.users.objects_class import find_user_name_by_id, find_user_classroom_number_by_id
 from app.users.main_class import Form
-from config import ADMIN
 
 router = Router()
 

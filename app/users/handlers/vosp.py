@@ -12,7 +12,6 @@ from app.users.objects_class import ID_VOSP
 from icecream import ic
 from app.users.objects_class import find_user_name_by_id, find_user_classroom_number_by_id
 from app.users.main_class import Form
-from config import ADMIN
 from app.users.handlers.other import rewrite_state_data
 from app.decorators import dc_change_keyboard
 
