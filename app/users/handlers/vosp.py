@@ -46,11 +46,15 @@ async def call_back_data_reaction_Yes(call: CallbackQuery, state: FSMContext):
 async def second_keyboard_reaction(message: Message, state: FSMContext):
     print(f"{message.from_user.id} - {message.from_user.full_name} - начал запись VOSP")
     await state.clear()
-    await state.set_state(Form.date)
+
     await state.update_data(user_name=find_user_name_by_id(message.from_user.id),
                             user_role='Воспитатель')
-    print("alo1")
-    await message.answer('Выберете дату', reply_markup=create_date_keyboard_for_vosp())
+    keyboard = create_date_keyboard_for_vosp()
+    if keyboard:
+        await message.answer('Выберете дату', reply_markup=keyboard)
+        await state.set_state(Form.date)
+    else:
+        await message.answer('Сегодня отсутствуют даты для записи')
 
 
 @router.callback_query(StateFilter(Form.date), Filter_data("user_role", "Воспитатель"))

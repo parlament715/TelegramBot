@@ -23,11 +23,16 @@ router = Router()
 async def second_keyboard_reaction(message: Message, state: FSMContext):
     print(f"{message.from_user.id} - {message.from_user.full_name} - начал запись teacher")
     await state.clear()
-    await state.set_state(Form.date)
+
     await state.update_data(user_name=find_user_name_by_id(message.from_user.id),
                             user_role="Классный советник")
     data = await state.get_data()
-    await message.answer('Выберете дату', reply_markup=create_date_keyboard_for_teacher())
+    keyboard = create_date_keyboard_for_vosp()
+    if keyboard:
+        await message.answer('Выберете дату', reply_markup=keyboard)
+        await state.set_state(Form.date)
+    else:
+        await message.answer('Сегодня отсутствуют даты для записи')
 
 
 @router.callback_query(StateFilter(Form.date), FilterId(ID_TEACHER))
