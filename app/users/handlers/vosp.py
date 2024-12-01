@@ -38,7 +38,7 @@ async def call_back_data_reaction_Yes(call: CallbackQuery, state: FSMContext):
         elif data["time"] in ("Обед", "Полдник"):
             await call.message.answer('Сколько человек (количество городских, через пробел количество интернатных)')
     elif data["user_role"] == "Воспитатель":
-        await call.message.answer('Сколько человек (количество 11-классников, через пробел количество 10-классников)')
+        await call.message.answer('Сколько человек (и 11 классников и 10 классников в сумме)')
     await state.set_state(Form.num)
 
 
@@ -49,6 +49,7 @@ async def second_keyboard_reaction(message: Message, state: FSMContext):
     await state.set_state(Form.date)
     await state.update_data(user_name=find_user_name_by_id(message.from_user.id),
                             user_role='Воспитатель')
+    print("alo1")
     await message.answer('Выберете дату', reply_markup=create_date_keyboard_for_vosp())
 
 
@@ -75,34 +76,32 @@ async def step_2_reaction(message: Message, state: FSMContext):
     data = await state.get_data()
     res = check_on_exist(data)
     if res == None:
-        await message.answer('Сколько человек (количество 11-классников, через пробел количество 10-классников)', reply_markup=remove)
+        await message.answer('Сколько человек (и 11 классников и 10 классников в сумме)', reply_markup=remove)
         await state.set_state(Form.num)
     else:
         await state.set_state("already exist")
-        await message.answer(f'Эта запись уже существует : \n11 класс : {res[0]}\n10 класс : {res[1]} \nВы хотите её заменить?', reply_markup=kb4)
+        await message.answer(f'Эта запись уже существует : {res[0]}\nВы хотите её заменить?', reply_markup=kb4)
 
 
 @router.message(StateFilter(Form.num), Filter_data("user_role", "Воспитатель"))
 async def step_3_reaction(message: Message, state: FSMContext):
     print(f"{message.from_user.id} - {message.from_user.full_name} - ввел количество vosp")
     data = await state.get_data()
-    try:
-        if type(int(message.text.split()[0])) == int and type(int(message.text.split()[1])) == int:
-            await message.answer("Успешно сохранено", reply_markup=kb5)
+    if len(message.text.split()) > 1:
+        await state.set_state(Form.num)
+        await message.answer("Некорректный  формат, пожалуйста введите ещё раз ОДНО число - общее количество питающихся", reply_markup=remove)
+    elif len(message.text.split()) == 1:
+        try:
+            int(message.text)
             await state.update_data(num=message.text)
             data = await state.get_data()
             ic(data)
             to_write(data)
             await state.set_state('chose')
-        else:
+            await message.answer("Успешно сохранено", reply_markup=kb5)
+        except ValueError:
             await state.set_state(Form.num)
-            await message.answer("Некорректный  формат, пожалуйста введите ещё раз два числа через пробел  в указанном формате", reply_markup=remove)
-    except IndexError:
-        await state.set_state(Form.num)
-        await message.answer("Некорректный  формат, пожалуйста введите ещё раз ДВА числа через ПРОБЕЛ  в указанном формате", reply_markup=remove)
-    except ValueError:
-        await state.set_state(Form.num)
-        await message.answer("Некорректный  формат, пожалуйста введите еще раз два ЧИСЛА через пробел  в указанном формате", reply_markup=remove)
+            await message.answer("Некорректный  формат, пожалуйста введите ещё раз одно ЧИСЛО - общее количество питающихся", reply_markup=remove)
 
 
 @router.message(F.text == "Записать на ЭТУ ЖЕ дату", StateFilter("chose"), FilterId(ID_VOSP))

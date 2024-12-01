@@ -14,21 +14,13 @@ def to_create(date):
 
     cursor.execute(f'''CREATE TABLE IF NOT EXISTS "{date}"
                     (who TEXT,
-                    breakfast_dorm_11 INTEGER,
-                    breakfast_dorm_10 INTEGER,
-                    breakfast_city_11 INTEGER,
-                    breakfast_city_10 INTEGER,
-                    lunch_dorm_11 INTEGER,
-                    lunch_dorm_10 INTEGER,
-                    lunch_city_11 INTEGER,
-                    lunch_city_10 INTEGER,
-                    snack_dorm_11 INTEGER,
-                    snack_dorm_10 INTEGER,
-                    snack_city_11 INTEGER,
-                    snack_city_10 INTEGER,
-                    dinner_dorm_11 INTEGER,
-                    dinner_dorm_10 INTEGER,
-                    class_num INTEGER,
+                    breakfast_dorm INTEGER,
+                    breakfast_city INTEGER,
+                    lunch_dorm INTEGER,
+                    lunch_city INTEGER,
+                    snack_dorm INTEGER,
+                    snack_city INTEGER,
+                    dinner_dorm INTEGER,
                     role TEXT)
                     ''')
 
@@ -38,25 +30,21 @@ def to_write(my_dict: dict):
     role = my_dict["user_role"]
     my_date = my_dict['date']
     ic(name, role, my_date, my_dict.keys(), my_dict)
-    if "classroom_number" in my_dict.keys():
-        class_num = my_dict["classroom_number"]
-    else:
-        class_num = "Null"
-    num_list = my_dict["num"].split()
+    num = my_dict["num"].split()
     to_create(str(my_date))
+    ic(from_dict_to_name_column(my_dict), my_dict)
     for (index, column_name) in enumerate(from_dict_to_name_column(my_dict)):
-        num = num_list[index]
         res = cursor.execute(
             f''' SELECT {column_name} FROM "{str(my_date)}" WHERE who = "{name}" ''').fetchone()
         if res == None:
             cursor.execute(f'''
                         INSERT INTO "{str(my_date)}"
-                        (who, role, {column_name},class_num) VALUES
-                        ("{name}","{role}",{num},{class_num})
+                        (who, role, {column_name}) VALUES
+                        ("{name}","{role}",{num[index]})
                             ''')  # если записи ещё не было то добавляем
         else:
             cursor.execute(
-                f''' UPDATE "{str(my_date)}" SET {column_name} = "{num}" WHERE who = "{name}" ''')  # если была то уже обновляем то что было
+                f''' UPDATE "{str(my_date)}" SET {column_name} = "{num[index]}" WHERE who = "{name}" ''')  # если была то уже обновляем то что было
     conn.commit()
     conn.close()
 
@@ -65,39 +53,22 @@ def from_dict_to_name_column(dict: dict) -> list:
     listik = []  # приводим в порядок данные перед записью
     time = dict["time"]
     role = dict["user_role"]
-    if role == "Классный советник":
-        class_num = dict["classroom_number"]
-    else:
-        class_num = "None"
-    print(class_num)
-    ic(dict)
     column_names = {
-        "Завтрак Классный советник 11": "breakfast_city_11",
-        "Завтрак Классный советник 10": "breakfast_city_10",
-        "Завтрак Воспитатель 11": "breakfast_dorm_11",
-        "Завтрак Воспитатель 10": "breakfast_dorm_10",
-        "Обед Классный советник 11": "lunch_city_11",
-        "Обед Классный советник 10": "lunch_city_10",
-        "Обед Классный советник 11 dorm": "lunch_dorm_11",
-        "Обед Классный советник 10 dorm": "lunch_dorm_10",
-        "Обед Воспитатель 11": "lunch_dorm_11",
-        "Обед Воспитатель 10": "lunch_dorm_10",
-        "Полдник Классный советник 11": "snack_city_11",
-        "Полдник Классный советник 10": "snack_city_10",
-        "Полдник Классный советник 11 dorm": "snack_dorm_11",
-        "Полдник Классный советник 10 dorm": "snack_dorm_10",
-        "Полдник Воспитатель 11": "snack_dorm_11",
-        "Полдник Воспитатель 10": "snack_dorm_10",
-        "Ужин Воспитатель 11": "dinner_dorm_11",
-        "Ужин Воспитатель 10": "dinner_dorm_10",
+        "Завтрак Классный советник": "breakfast_city",
+        "Завтрак Воспитатель": "breakfast_dorm",
+        "Обед Классный советник": "lunch_city",
+        "Обед Классный советник dorm": "lunch_dorm",
+        "Обед Воспитатель": "lunch_dorm",
+        "Полдник Классный советник": "snack_city",
+        "Полдник Классный советник dorm": "snack_dorm",
+        "Полдник Воспитатель": "snack_dorm",
+        "Ужин Воспитатель": "dinner_dorm",
     }
     _column_name = time + " " + role
     if role == 'Классный советник' and time == 'Завтрак':
-        _column_name += f' {str(class_num)}'
         column_name = column_names[_column_name]
         listik.append(column_name)
     elif role == "Классный советник" and (time == "Обед" or time == "Полдник"):
-        _column_name += f' {str(class_num)}'
         column_name = column_names[_column_name]
         listik.append(column_name)
         # to_to_write(my_date,column_name,name,class_num,num.split()[0])
@@ -106,10 +77,7 @@ def from_dict_to_name_column(dict: dict) -> list:
         listik.append(column_name)
         # to_to_write(my_date,column_name,name,class_num,num.split()[1])
     elif role == "Воспитатель":
-        print(column_names[_column_name + ' 11'], _column_name + ' 11')
-        print(column_names[_column_name + ' 10'], _column_name + ' 10')
-        listik.append(column_names[_column_name + ' 11'])
-        listik.append(column_names[_column_name + ' 10'])
+        listik.append(column_names[_column_name])
     return listik
 
 
@@ -133,15 +101,18 @@ def check_on_exist(my_dict: dict) -> Union[list, None]:
     time = my_dict["time"]
     role = my_dict["user_role"]
     res = []
-
     to_create(my_date)
+    # ic(from_dict_to_name_column(my_dict), my_dict)
     for time in from_dict_to_name_column(my_dict):
         a = cursor.execute(
             f''' SELECT {time} FROM "{str(my_date)}" WHERE who = "{name}"''').fetchone()
+        ic(f''' SELECT {time} FROM "{str(my_date)}" WHERE who = "{name}"''')
         if a != None and a != (None,):
+            ic(a)
             res.append(a[0])
 
     if res != []:
+        ic(res)
         return res
     return None
 
@@ -157,39 +128,24 @@ def fill_template(template_path: str, output_path: str, context: dict):
 
 def get_data_for_docx(date: str) -> dict:
     to_create(date)
-    try:
-        breakfast_city_11 = sum([int(x) for x in to_read_db(
-            date, "breakfast_city_11", where="class_num=11")])
-        lunch_dorm_11 = sum([int(x) for x in to_read_db(
-            date, "lunch_dorm_11", where="class_num=11")])
-        lunch_city_11 = sum([int(x) for x in to_read_db(
-            date, "lunch_city_11", where="class_num=11")])
-        snack_dorm_11 = sum([int(x) for x in to_read_db(
-            date, "snack_dorm_11", where="class_num=11")])
-        snack_city_11 = sum([int(x) for x in to_read_db(
-            date, "snack_city_11", where="class_num=11")])
+    # try:
+    breakfast_city = sum([int(x) for x in to_read_db(
+        date, "breakfast_city") if x != "None"])
+    lunch_dorm = sum([int(x) for x in to_read_db(
+        date, "lunch_dorm") if x != "None"])
+    lunch_city = sum([int(x) for x in to_read_db(
+        date, "lunch_city") if x != "None"])
+    snack_dorm = sum([int(x) for x in to_read_db(
+        date, "snack_dorm") if x != "None"])
+    snack_city = sum([int(x) for x in to_read_db(
+        date, "snack_city") if x != "None"])
 
-        breakfast_city_10 = sum([int(x) for x in to_read_db(
-            date, "breakfast_city_10", where="class_num=10")])
-        lunch_dorm_10 = sum([int(x) for x in to_read_db(
-            date, "lunch_dorm_10", where="class_num=10")])
-        lunch_city_10 = sum([int(x) for x in to_read_db(
-            date, "lunch_city_10", where="class_num=10")])
-        snack_dorm_10 = sum([int(x) for x in to_read_db(
-            date, "snack_dorm_10", where="class_num=10")])
-        snack_city_10 = sum([int(x) for x in to_read_db(
-            date, "snack_city_10", where="class_num=10")])
-
-        breakfast_dorm_11 = sum([int(x) for x in to_read_db(
-            date, "breakfast_dorm_11", where='role = "Воспитатель"')])
-        breakfast_dorm_10 = sum([int(x) for x in to_read_db(
-            date, "breakfast_dorm_10", where='role = "Воспитатель"')])
-        dinner_dorm_10 = sum([int(x) for x in to_read_db(
-            date, "dinner_dorm_10", where='role = "Воспитатель"')])
-        dinner_dorm_11 = sum([int(x) for x in to_read_db(
-            date, "dinner_dorm_11", where='role = "Воспитатель"')])
-    except ValueError:
-        return "Error"
+    breakfast_dorm = sum([int(x) for x in to_read_db(
+        date, "breakfast_dorm") if x != "None"])
+    dinner_dorm = sum([int(x) for x in to_read_db(
+        date, "dinner_dorm") if x != "None"])
+    # except ValueError:
+    #     return "Error"
 
     # разбиваем дату
     year, month, day = map(int, date.split('-'))
@@ -202,29 +158,13 @@ def get_data_for_docx(date: str) -> dict:
         "data_num": str(day),
         "data_month": month,
         "data_year": str(year),
-        "a": str(breakfast_city_10 + breakfast_city_11),
-        "b": str(breakfast_dorm_10 + breakfast_dorm_11),
-        "c": str(lunch_city_10 + lunch_city_11),
-        "d": str(lunch_dorm_10 + lunch_dorm_11),
-        "e": str(snack_city_10 + snack_city_11),
-        "f": str(snack_dorm_10 + snack_dorm_11),
+        "a": str(breakfast_city),
+        "b": str(breakfast_dorm),
+        "c": str(lunch_city),
+        "d": str(lunch_dorm),
+        "e": str(snack_city),
+        "f": str(snack_dorm),
         "g": "0",
-        "h": str(dinner_dorm_10 + dinner_dorm_11),
-        "i": str(breakfast_city_10),
-        "j": str(breakfast_dorm_10),
-        "k": str(breakfast_city_11),
-        "l": str(breakfast_dorm_11),
-        "m": str(lunch_city_10),
-        "n": str(lunch_dorm_10),
-        "o": str(lunch_city_11),
-        "p": str(lunch_dorm_11),
-        "q": str(snack_city_10),
-        "r": str(snack_dorm_10),
-        "s": str(snack_city_11),
-        "t": str(snack_dorm_11),
-        "u": "0",
-        "v": str(dinner_dorm_10),
-        "w": "0",
-        "x": str(dinner_dorm_11),
+        "h": str(dinner_dorm),
     }
     fill_template("example.docx", "docx.docx", content)

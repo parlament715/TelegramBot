@@ -27,7 +27,7 @@ async def first_keyboard_reaction(message: Message, state: FSMContext):
 
 @router.message(F.text == "Посмотреть другую дату", FilterId(ID_MAIN_VOSP))
 async def first_keyboard_reaction(message: Message, state: FSMContext):
-    await message.answer('Для просмотра данных нажмите на предложенные варианты или введите их самостоятельно в таком формате : год-месяц-число.', reply_markup=kb_date_all)
+    await message.answer('Для просмотра данных нажмите на предложенные варианты или введите их самостоятельно в таком формате : год-месяц-число.', reply_markup=create_main_vosp_date_keyboard())
 
     await state.set_state("give_data")
 
