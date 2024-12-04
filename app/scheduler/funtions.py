@@ -14,6 +14,7 @@ from app.database.table import get_png
 from aiogram.types import FSInputFile
 from app.keyboard import is_full_day
 from app.users.objects_class import find_user_name_by_id
+from config import time_to
 
 
 async def send_to_teacher(text):
@@ -48,6 +49,29 @@ async def send_notifications():
     await send_notifications_teacher()
 
 
+async def send_notifications_teacher():
+    date = datetime.datetime.now().date()
+    weekday_now = date.weekday()
+    if not (1 <= weekday_now <= 5):
+        return
+    weekdays = {
+        1: [("Четверг", date + datetime.timedelta(2))],
+        2: [("Пятница", date + datetime.timedelta(2))],
+        3: [("Суббота", date + datetime.timedelta(2)),
+            ("Понедельник", date + datetime.timedelta(4))],
+        4: [("Вторник", date + datetime.timedelta(2))],
+        5: [("Среда", date + datetime.timedelta(2))],
+    }
+    listik = weekdays[weekday_now]
+    for id in ID_TEACHER:
+        my_dict = {"user_name": find_user_name_by_id(id),
+                   "user_role": "Классный советник",
+                   }
+        a = is_full_days(my_dict, listik)
+        if a != True:  # если не полный день
+            await bot.send_message(id, f"У вас не заполнены дни :\n{" ".join(a)}\nПожалуйста заполните до {time_to.hour}:{time_to.minute}")
+
+
 async def send_notifications_vosp():
     date = datetime.datetime.now().date()
     weekday_now = date.weekday()
@@ -69,13 +93,13 @@ async def send_notifications_vosp():
                    }
         a = is_full_days(my_dict, listik)
         if a != True:  # если не полный день
-            await bot.send_message(id, f"У вас не заполнены дни :\n{" ".join(a)}")
+            await bot.send_message(id, f"У вас не заполнены дни :\n{" ".join(a)}\nПожалуйста заполните до {time_to.hour}:{time_to.minute}")
 
 
 def is_full_days(my_dict: dict, listik: list):
     c = []
     for weekday, date in listik:
-        if not is_full_day(my_dict, date):
+        if not is_full_day(my_dict, str(date)):
             c.append(weekday)
     if not c:
         return True
