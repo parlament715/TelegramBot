@@ -14,3 +14,5 @@ def add_job_scheduler(scheduler):
                       minute=time_from.minute, args=["запись открыта"])
     scheduler.add_job(send_to_vosp, "cron", day_of_week="1-5", hour=time_to.hour,
                       minute=time_to.minute, args=["запись закрыта"])
+    scheduler.add_job(send_notifications_vosp, "cron", day_of_week="1-5", hour=time_to.hour,
+                      minute=time_to.minute)
