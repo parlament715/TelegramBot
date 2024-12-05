@@ -69,7 +69,7 @@ async def send_notifications_teacher():
                    }
         a = is_full_days(my_dict, listik)
         if a != True:  # если не полный день
-            await bot.send_message(id, f"У вас не заполнены дни :\n{" ".join(a)}\nПожалуйста заполните до {time_to.hour}:{time_to.minute}")
+            await bot.send_message(id, f"У вас не заполнены дни :\n{" ".join(a)}\nПожалуйста заполните до {time_to.hour:02}:{time_to.minute:02}")
 
 
 async def send_notifications_vosp():
@@ -93,7 +93,7 @@ async def send_notifications_vosp():
                    }
         a = is_full_days(my_dict, listik)
         if a != True:  # если не полный день
-            await bot.send_message(id, f"У вас не заполнены дни :\n{" ".join(a)}\nПожалуйста заполните до {time_to.hour}:{time_to.minute}")
+            await bot.send_message(id, f"У вас не заполнены дни :\n{" ".join(a)}\nПожалуйста заполните до {time_to.hour:02}:{time_to.minute:02}")
 
 
 def is_full_days(my_dict: dict, listik: list):
