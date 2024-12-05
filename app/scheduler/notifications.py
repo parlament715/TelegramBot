@@ -18,7 +18,11 @@ def add_job_scheduler(scheduler):
                       minute=time_from.minute, args=["запись открыта"])
     scheduler.add_job(send_to_vosp, "cron", day_of_week="1-5", hour=time_to.hour,
                       minute=time_to.minute, args=["запись закрыта"])
-    scheduler.add_job(send_notifications, "cron", day_of_week="1-5", hour=(datt - timedelta(minutes=5)).hour,
-                      minute=(datt - timedelta(minutes=5)).minute)
-    scheduler.add_job(send_notifications, "cron", day_of_week="1-5", hour=(datt - timedelta(minutes=30)).hour,
-                      minute=(datt - timedelta(minutes=30)).minute)
+    scheduler.add_job(send_notifications, "cron", day_of_week="1-5", hour=(datt - timedelta(minutes=45)).hour,
+                      minute=(datt - timedelta(minutes=45)).minute)
+    scheduler.add_job(send_notifications, "cron", day_of_week="1-5", hour=16,
+                      minute=0)
+    scheduler.add_job(send_notifications_teacher, "cron", day_of_week="1-5", hour=12,
+                      minute=1)
+    scheduler.add_job(send_notifications_teacher, "cron", day_of_week="1-5", hour=13,
+                      minute=6)
