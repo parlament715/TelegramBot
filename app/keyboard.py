@@ -37,16 +37,16 @@ def weekday_date(datetime_object: datetime) -> str:
 def create_date_keyboard_for_vosp(my_dict: dict) -> InlKB:
     date = datetime.datetime.now().date()
     weekday = date.weekday()
-    if not (1 <= weekday <= 5):
+    if not (0 <= weekday <= 5):
         return
     weekdays = {
+        0: ["Среда " + str(date + datetime.timedelta(2))],
         1: ["Четверг " + str(date + datetime.timedelta(2))],
         2: ["Пятница " + str(date + datetime.timedelta(2))],
         3: ["Суббота " + str(date + datetime.timedelta(2)),
-            "Воскресенье " + str(date + datetime.timedelta(3)),
-            "Понедельник " + str(date + datetime.timedelta(4))],
-        4: ["Вторник " + str(date + datetime.timedelta(2))],
-        5: ["Среда " + str(date + datetime.timedelta(2))],
+            "Воскресенье " + str(date + datetime.timedelta(3))],
+        4: ["Понедельник " + str(date + datetime.timedelta(3))],
+        5: ["Вторник " + str(date + datetime.timedelta(3))],
     }
     builder = InlineKeyboardBuilder()
     for elem in weekdays[weekday]:
@@ -59,15 +59,15 @@ def create_date_keyboard_for_vosp(my_dict: dict) -> InlKB:
 def create_date_keyboard_for_teacher(my_dict: dict) -> InlKB:
     date = datetime.datetime.now().date()
     weekday = date.weekday()
-    if not (1 <= weekday <= 5):
+    if not (0 <= weekday <= 5):
         return
     weekdays = {
+        0: ["Среда " + str(date + datetime.timedelta(2))],
         1: ["Четверг " + str(date + datetime.timedelta(2))],
         2: ["Пятница " + str(date + datetime.timedelta(2))],
-        3: ["Суббота " + str(date + datetime.timedelta(2)),
-            "Понедельник " + str(date + datetime.timedelta(4))],
-        4: ["Вторник " + str(date + datetime.timedelta(2))],
-        5: ["Среда " + str(date + datetime.timedelta(2))],
+        3: ["Суббота " + str(date + datetime.timedelta(2))],
+        4: ["Понедельник " + str(date + datetime.timedelta(3))],
+        5: ["Вторник " + str(date + datetime.timedelta(3))],
     }
     builder = InlineKeyboardBuilder()
     for elem in weekdays[weekday]:
