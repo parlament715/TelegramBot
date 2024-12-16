@@ -52,15 +52,15 @@ async def send_notifications():
 async def send_notifications_teacher():
     date = datetime.datetime.now().date()
     weekday_now = date.weekday()
-    if not (0 <= weekday <= 5):
+    if not (0 <= weekday_now <= 5):
         return
     weekdays = {
-        0: ["Среда " + str(date + datetime.timedelta(2))],
-        1: ["Четверг " + str(date + datetime.timedelta(2))],
-        2: ["Пятница " + str(date + datetime.timedelta(2))],
-        3: ["Суббота " + str(date + datetime.timedelta(2))],
-        4: ["Понедельник " + str(date + datetime.timedelta(3))],
-        5: ["Вторник " + str(date + datetime.timedelta(3))],
+        0: [("Среда", date + datetime.timedelta(2))],
+        1: [("Четверг",  date + datetime.timedelta(2))],
+        2: [("Пятница",  date + datetime.timedelta(2))],
+        3: [("Суббота",  date + datetime.timedelta(2))],
+        4: [("Понедельник",  date + datetime.timedelta(3))],
+        5: [("Вторник",  date + datetime.timedelta(3))],
     }
     listik = weekdays[weekday_now]
     for id in ID_TEACHER:
@@ -75,16 +75,16 @@ async def send_notifications_teacher():
 async def send_notifications_vosp():
     date = datetime.datetime.now().date()
     weekday_now = date.weekday()
-    if not (0 <= weekday <= 5):
+    if not (0 <= weekday_now <= 5):
         return
     weekdays = {
-        0: ["Среда " + str(date + datetime.timedelta(2))],
-        1: ["Четверг " + str(date + datetime.timedelta(2))],
-        2: ["Пятница " + str(date + datetime.timedelta(2))],
-        3: ["Суббота " + str(date + datetime.timedelta(2)),
-            "Воскресенье " + str(date + datetime.timedelta(3))],
-        4: ["Понедельник " + str(date + datetime.timedelta(3))],
-        5: ["Вторник " + str(date + datetime.timedelta(3))],
+        0: [("Среда", date + datetime.timedelta(2))],
+        1: [("Четверг",  date + datetime.timedelta(2))],
+        2: [("Пятница",  date + datetime.timedelta(2))],
+        3: [("Суббота",  date + datetime.timedelta(2)),
+            ("Воскресенье", date + datetime.timedelta(3))],
+        4: [("Понедельник",  date + datetime.timedelta(3))],
+        5: [("Вторник",  date + datetime.timedelta(3))],
     }
     listik = weekdays[weekday_now]
     for id in ID_VOSP:
