@@ -7,7 +7,6 @@ if __name__ == "__main__":
 
 from loader import bot
 from app.users.objects_class import ID_TEACHER, ID_MAIN_VOSP, ID_VOSP
-import requests
 import datetime
 from app.database.request import get_data_for_docx
 from app.database.table import get_png

@@ -1,6 +1,5 @@
 __pycache__
 *.png
-*.txt
 .env
 *.DS_Store
 *.db
