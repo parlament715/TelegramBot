@@ -5,10 +5,9 @@ if __name__ == "__main__":
     # icecream.ic(str(Path(__file__).resolve().parents[2]))
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from loader import bot
+from loader import bot, rq
 from app.users.objects_class import ID_TEACHER, ID_MAIN_VOSP, ID_VOSP
 import datetime
-from app.database.request import get_data_for_docx
 from app.database.table import get_png
 from aiogram.types import FSInputFile
 from app.keyboard import is_full_day
@@ -29,7 +28,8 @@ async def send_to_vosp(text):
 async def send_document():
     day = (datetime.datetime.now() + datetime.timedelta(1)).strftime("%Y-%m-%d")
     list_png = get_png(day)
-    res_docx = get_data_for_docx(day)
+    with rq:
+        res_docx = rq.get_data_for_docx(day)
     file = FSInputFile("docx.docx")
     for ID in ID_MAIN_VOSP:
         for path in list_png:

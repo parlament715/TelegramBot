@@ -3,10 +3,9 @@ from aiogram.filters import CommandStart, StateFilter
 from app.keyboard import gen_keyboard_time_for_teacher, create_date_keyboard_for_teacher, yes_no_keyboard, remove, kb_check_other_date, kb5
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
-from app.database.request import to_write, check_on_exist, get_data_for_docx
 from app.database.table import get_png
 from aiogram.types import FSInputFile
-from loader import bot
+from loader import bot, rq
 from app.users.filter_class import FilterId, Filter_data
 from app.users.objects_class import ID_TEACHER
 from icecream import ic
@@ -58,7 +57,8 @@ async def step_1_reaction(call: CallbackQuery, state: FSMContext):
 async def step_2_reaction(call: CallbackQuery, state: FSMContext):
     await state.update_data(time=call.data)
     data = await state.get_data()
-    res = check_on_exist(data)
+    with rq:
+        res = rq.check_on_exist(data)
     if res == None:
         if call.data == "Обед" or call.data == "Полдник":
             await call.message.answer('Сколько человек (количество городских, через пробел количество интернатных)', reply_markup=remove)
@@ -84,7 +84,8 @@ async def step_3_reaction(message: Message, state: FSMContext):
                 await state.update_data(num=message.text)
                 data = await state.get_data()
                 # ic(data)
-                to_write(data)
+                with rq:
+                    rq.to_write(data)
                 await state.set_state('chose Teacher')
                 await message.answer("Успешно сохранено", reply_markup=kb5)
             else:
@@ -101,7 +102,8 @@ async def step_3_reaction(message: Message, state: FSMContext):
             # проверяем это число или нет
             await state.update_data(num=str(int(message.text)))
             data = await state.get_data()
-            to_write(data)
+            with rq:
+                rq.to_write(data)
             await message.answer("Успешно сохранено", reply_markup=kb5)
             await state.set_state('chose Teacher')
         except ValueError:

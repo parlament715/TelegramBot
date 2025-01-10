@@ -2,46 +2,38 @@ import pandas as pd
 from icecream import ic
 from typing import Union
 import matplotlib.pyplot as plt
-from app.database.request import to_read_db
+from loader import rq
 # from config import today
 
 
-def get_png(table_name) -> Union[list]:
+def get_png(date) -> Union[list]:
     # Создание данных для таблицы
     listik = []
-    data_name_dorm = to_read_db(
-        table_name, "who", where='role = "Воспитатель"')
-    data_name_class = to_read_db(
-        table_name, "who", where='role = "Классный советник"')
+    with rq:
+        data_name_dorm = rq.to_read_db("vosp", date, "name")
+        data_name_class = rq.to_read_db("teacher", date, "name")
 
-    if data_name_class != []:
-        listik.append("table_class.png")
-        data_breakfast_city = to_read_db(
-            table_name, "breakfast_city", where='"role" = "Классный советник"')
-        data_lunch_dorm = to_read_db(
-            table_name, "lunch_dorm", where='"role" = "Классный советник"')
-        data_lunch_city = to_read_db(
-            table_name, "lunch_city", where='"role" = "Классный советник"')
-        data_snack_dorm = to_read_db(
-            table_name, "snack_dorm", where='"role" = "Классный советник"')
-        data_snack_city = to_read_db(
-            table_name, "snack_city", where='"role" = "Классный советник"')
-        data_class = {'Название': data_name_class,
-                      'Завтрак город': data_breakfast_city,
-                      'Обед город': data_lunch_city,
-                      'Обед общ.': data_lunch_dorm,
-                      'Полдник город': data_snack_city,
-                      'Полдник общ.': data_snack_dorm, }
+        if data_name_class != []:
+            listik.append("table_class.png")
+            data_breakfast_city = rq.to_read_db("teacher", date, "breakfast")
+            data_lunch_dorm = rq.to_read_db("teacher", date, "lunch_dorm")
+            data_lunch_city = rq.to_read_db("teacher", date, "lunch_city")
+            data_snack_dorm = rq.to_read_db("teacher", date, "snack_dorm")
+            data_snack_city = rq.to_read_db("teacher", date, "snack_city")
+            data_class = {'Название': data_name_class,
+                          'Завтрак город': data_breakfast_city,
+                          'Обед город': data_lunch_city,
+                          'Обед общ.': data_lunch_dorm,
+                          'Полдник город': data_snack_city,
+                          'Полдник общ.': data_snack_dorm, }
 
-    if data_name_dorm != []:
-        listik.append("table_dorm.png")
-        data_breakfast_dorm = to_read_db(
-            table_name, "breakfast_dorm", where='role = "Воспитатель"')
-        data_dinner_dorm = to_read_db(
-            table_name, "dinner_dorm", where='role = "Воспитатель"')
-        data_dorm = {'Название': data_name_dorm,
-                     'Завтрак': data_breakfast_dorm,
-                     'Ужин': data_dinner_dorm, }
+        if data_name_dorm != []:
+            listik.append("table_dorm.png")
+            data_breakfast_dorm = rq.to_read_db("vosp", date, "breakfast")
+            data_dinner_dorm = rq.to_read_db("vosp", date, "dinner")
+            data_dorm = {'Название': data_name_dorm,
+                         'Завтрак': data_breakfast_dorm,
+                         'Ужин': data_dinner_dorm, }
         # Если таблица пустая то return Error
 
     # Создание DataFrame из данных

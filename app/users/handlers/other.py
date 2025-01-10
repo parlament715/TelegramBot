@@ -1,17 +1,9 @@
 from aiogram.types import Message, CallbackQuery
-from aiogram.filters import CommandStart, StateFilter
-# from app.keyboard import kb1, kb4, remove, gen_keyboard_time_for_vosp, kb_check_other_date, kb5, kb6
-from aiogram import F, Router
+from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from app.database.request import to_write, check_on_exist, get_data_for_docx
-from app.database.table import get_png
-from aiogram.types import FSInputFile
-from loader import bot
-from app.users.filter_class import FilterId, Filter_data
+from app.users.filter_class import FilterId
 from icecream import ic
 from app.users.objects_class import ID_TEACHER, ID_VOSP, ID_MAIN_VOSP
-from app.users.objects_class import find_user_name_by_id, find_user_classroom_number_by_id
-from app.users.main_class import Form
 
 router = Router()
 

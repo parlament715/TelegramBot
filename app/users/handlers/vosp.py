@@ -1,16 +1,13 @@
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import CommandStart, StateFilter
-from app.keyboard import create_date_keyboard_for_vosp, yes_no_keyboard, remove, gen_keyboard_time_for_vosp, kb_check_other_date, kb5
-from aiogram import F, Router
+from app.keyboard import create_date_keyboard_for_vosp, yes_no_keyboard, remove, gen_keyboard_time_for_vosp, kb5
+from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from app.database.request import to_write, check_on_exist, get_data_for_docx
-from app.database.table import get_png
-from aiogram.types import FSInputFile
-from loader import bot
+from loader import rq
 from app.users.filter_class import FilterId, Filter_data
 from app.users.objects_class import ID_VOSP
 from icecream import ic
-from app.users.objects_class import find_user_name_by_id, find_user_classroom_number_by_id
+from app.users.objects_class import find_user_name_by_id
 from app.users.main_class import Form
 from app.users.handlers.other import rewrite_state_data
 from app.decorators import dc_change_keyboard
@@ -83,7 +80,8 @@ async def step_2_reaction(call: CallbackQuery, state: FSMContext):
     print(f"{call.from_user.id} - {call.from_user.full_name} - выбрал время vosp")
     await state.update_data(time=call.data)
     data = await state.get_data()
-    res = check_on_exist(data)
+    with rq:
+        res = rq.check_on_exist(data)
     if res == None:
         await call.message.answer('Сколько человек (и 11 классников и 10 классников в сумме)', reply_markup=remove)
         await state.set_state(Form.num)
@@ -105,7 +103,8 @@ async def step_3_reaction(message: Message, state: FSMContext):
             int(message.text)
             await state.update_data(num=message.text)
             data = await state.get_data()
-            to_write(data)
+            with rq:
+                rq.to_write(data)
             await state.set_state('chose')
             await message.answer("Успешно сохранено", reply_markup=kb5)
         except ValueError:

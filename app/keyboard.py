@@ -4,6 +4,7 @@ from aiogram.types import InlineKeyboardMarkup as InlKB
 from aiogram.types import InlineKeyboardButton as InKButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 import datetime
+from loader import rq
 from app.database import request
 from icecream import ic
 
@@ -123,7 +124,6 @@ def is_full_day(my_dict: dict, date: str) -> str:
         listik = ["Завтрак", "Обед", "Полдник"]
     else:
         raise Exception("user_role must be Классный советник or Воспитатель")
-    request.to_create(my_dict["date"])
     for time in listik:
         if is_full_time(my_dict, time) == "":
             return ""
@@ -135,8 +135,9 @@ def is_full_time(my_dict: dict, time: str) -> str:
     name = my_dict["user_name"]
     request.to_create(date)
     my_dict["time"] = time
-    if request.check_on_exist(my_dict):
-        return "♻️ "
+    with rq:
+        if rq.check_on_exist(my_dict):
+            return "♻️ "
     return ""
 
 

@@ -1,16 +1,14 @@
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import CommandStart, StateFilter
-from app.keyboard import yes_no_keyboard, remove, create_main_vosp_date_keyboard, kb_check_other_date
+from app.keyboard import create_main_vosp_date_keyboard, kb_check_other_date
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
-from app.database.request import to_write, check_on_exist, get_data_for_docx
 from app.database.table import get_png
 from aiogram.types import FSInputFile
-from loader import bot
-from app.users.filter_class import FilterId, Filter_data
+from loader import bot, rq
+from app.users.filter_class import FilterId
 from app.users.objects_class import ID_MAIN_VOSP
 from icecream import ic
-from app.users.objects_class import find_user_name_by_id, find_user_classroom_number_by_id
 from app.users.main_class import Form
 
 router = Router()
@@ -39,7 +37,8 @@ async def state_give_data_reaction(message: Message, state: FSMContext):
     else:
         message_text = message.text
     list_png = get_png(message_text)
-    res_docx = get_data_for_docx(message_text)
+    with rq:
+        res_docx = rq.get_data_for_docx(message_text)
     file = FSInputFile("docx.docx")
     for path in list_png:
         if path == list_png[-1]:
