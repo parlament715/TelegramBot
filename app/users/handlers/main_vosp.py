@@ -39,7 +39,7 @@ async def state_give_data_reaction(message: Message, state: FSMContext):
     list_png = get_png(message_text)
     with rq:
         res_docx = rq.get_data_for_docx(message_text)
-    file = FSInputFile("docx.docx")
+    file = FSInputFile("docx.docx", f"Приказ от {message_text}.docx")
     for path in list_png:
         if path == list_png[-1]:
             await bot.send_photo(chat_id=message.chat.id, photo=FSInputFile(path), reply_markup=kb_check_other_date)

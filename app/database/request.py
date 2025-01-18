@@ -252,7 +252,7 @@ class Request:
             "vosp", date, "breakfast") if x != "None"])
         dinner_dorm = sum([int(x) for x in self.to_read_db(
             "vosp", date, "dinner") if x != "None"])
-        year, month, day = map(int, date.split('-'))
+        year, month, day = map(int, date.split('.'))
         months_genitive = [
             'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
             'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'

@@ -11,12 +11,33 @@ from icecream import ic
 
 def create_main_vosp_date_keyboard():
     today = datetime.datetime.now().date()
+    weekday = today.weekday()
+    weekdays = {
+        0: [(today + datetime.timedelta(2))],  # "Среда " +
+        1: [(today + datetime.timedelta(2))],  # "Четверг " +
+        2: [(today + datetime.timedelta(2))],  # "Пятница " +
+        3: [(today + datetime.timedelta(2)),  # "Суббота " +
+            (today + datetime.timedelta(3))],  # "Воскресенье " +
+        4: [(today + datetime.timedelta(3))],  # "Понедельник " +
+        5: [(today + datetime.timedelta(3))],  # "Вторник " +
+    }
+    builder = ReplyKeyboardBuilder()
+    for i in range(4):
+        date_list = weekdays[weekday]
+        for date in date_list:
+            date_i = date - datetime.timedelta(i)
+            builder.add(KButton(text=weekday_date(date_i)))
+    builder.adjust(1)
+    return builder.as_markup(resize_keyboard=True)
     kb_date_all = ReplyKeyboardMarkup(
-        resize_keyboard=True, keyboard=[[KButton(text=f'Сегодня {str(today)}')],
+        resize_keyboard=True, keyboard=[[KButton(text=weekdays[today.weekday()])],
                                         [KButton(
-                                            text=f'Завтра {str(today + datetime.timedelta(days=1))}')],
+                                            text=weekdays[(today - datetime.timedelta(1)).weekday()])],
                                         [KButton(
-                                            text=f'Послезавтра {str(today + datetime.timedelta(days=2))}')]])
+                                            text=weekdays[
+                                                (today - datetime.timedelta(2)).weekday()]
+                                        )
+        ]])
 
     return kb_date_all
 
@@ -32,7 +53,7 @@ def weekday_date(datetime_object: datetime) -> str:
         5: "Суббота",
         6: "Воскресенье"
     }.get(datetime_object.weekday(), "Unknown")
-    return weekday_str + datetime_object.strftime(" %d.%m.%Y")
+    return weekday_str + " " + datetime_object.strftime("%d.%m.%Y")
 
 
 def create_date_keyboard_for_vosp(my_dict: dict) -> InlKB:
@@ -41,13 +62,13 @@ def create_date_keyboard_for_vosp(my_dict: dict) -> InlKB:
     if not (0 <= weekday <= 5):
         return
     weekdays = {
-        0: ["Среда " + str(date + datetime.timedelta(2))],
-        1: ["Четверг " + str(date + datetime.timedelta(2))],
-        2: ["Пятница " + str(date + datetime.timedelta(2))],
-        3: ["Суббота " + str(date + datetime.timedelta(2)),
-            "Воскресенье " + str(date + datetime.timedelta(3))],
-        4: ["Понедельник " + str(date + datetime.timedelta(3))],
-        5: ["Вторник " + str(date + datetime.timedelta(3))],
+        0: ["Среда " + (date + datetime.timedelta(2)).strftime("%d.%m.%Y")],
+        1: ["Четверг " + (date + datetime.timedelta(2)).strftime("%d.%m.%Y")],
+        2: ["Пятница " + (date + datetime.timedelta(2)).strftime("%d.%m.%Y")],
+        3: ["Суббота " + (date + datetime.timedelta(2)).strftime("%d.%m.%Y"),
+            "Воскресенье " + (date + datetime.timedelta(3)).strftime("%d.%m.%Y")],
+        4: ["Понедельник " + (date + datetime.timedelta(3)).strftime("%d.%m.%Y")],
+        5: ["Вторник " + (date + datetime.timedelta(3)).strftime("%d.%m.%Y")],
     }
     builder = InlineKeyboardBuilder()
     for elem in weekdays[weekday]:
@@ -63,12 +84,12 @@ def create_date_keyboard_for_teacher(my_dict: dict) -> InlKB:
     if not (0 <= weekday <= 5):
         return
     weekdays = {
-        0: ["Среда " + str(date + datetime.timedelta(2))],
-        1: ["Четверг " + str(date + datetime.timedelta(2))],
-        2: ["Пятница " + str(date + datetime.timedelta(2))],
-        3: ["Суббота " + str(date + datetime.timedelta(2))],
-        4: ["Понедельник " + str(date + datetime.timedelta(3))],
-        5: ["Вторник " + str(date + datetime.timedelta(3))],
+        0: ["Среда " + (date + datetime.timedelta(2)).strftime("%d.%m.%Y")],
+        1: ["Четверг " + (date + datetime.timedelta(2)).strftime("%d.%m.%Y")],
+        2: ["Пятница " + (date + datetime.timedelta(2)).strftime("%d.%m.%Y")],
+        3: ["Суббота " + (date + datetime.timedelta(2)).strftime("%d.%m.%Y")],
+        4: ["Понедельник " + (date + datetime.timedelta(3)).strftime("%d.%m.%Y")],
+        5: ["Вторник " + (date + datetime.timedelta(3)).strftime("%d.%m.%Y")],
     }
     builder = InlineKeyboardBuilder()
     for elem in weekdays[weekday]:
@@ -79,7 +100,7 @@ def create_date_keyboard_for_teacher(my_dict: dict) -> InlKB:
 
 
 kb_check_other_date = ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
-                                          [KButton(text='Посмотреть другую дату')]])
+    [KButton(text='Посмотреть другую дату')]])
 
 
 def gen_keyboard_time_for_teacher(my_dict: dict) -> InlKB:
@@ -93,7 +114,7 @@ def gen_keyboard_time_for_teacher(my_dict: dict) -> InlKB:
 
 
 def gen_keyboard_time_for_vosp(my_dict: dict) -> InlKB:
-    date_obj = datetime.datetime.strptime(my_dict["date"], '%Y-%m-%d')
+    date_obj = datetime.datetime.strptime(my_dict["date"], '%d.%m.%Y')
     if date_obj.weekday() == 6:
         keyboard_0x002 = [[InKButton(text=is_full_time(my_dict, "Завтрак") + 'Завтрак', callback_data='Завтрак')],
                           [InKButton(text=is_full_time(my_dict, "Обед") +
@@ -113,7 +134,7 @@ def gen_keyboard_time_for_vosp(my_dict: dict) -> InlKB:
 
 
 def is_full_day(my_dict: dict, date: str) -> str:
-    date_obj = datetime.datetime.strptime(date, '%Y-%m-%d')
+    date_obj = datetime.datetime.strptime(date, '%d.%m.%Y')
     my_dict["date"] = date
     if my_dict["user_role"] == "Воспитатель":
         if date_obj.weekday() == 6:
