@@ -21,6 +21,8 @@ class CheckerSubscriptionsOnChannel(BaseMiddleware):
         elif str(event.from_user.id) in ID_TEACHER or str(event.from_user.id) in ID_VOSP:
             if time_from <= datetime.now().time() <= time_to:
                 return await handler(event, data)
+            else:
+                await event.answer("Время записи уже закончилось")
 
 
 class CheckerOnCallbackData(BaseMiddleware):
@@ -35,3 +37,5 @@ class CheckerOnCallbackData(BaseMiddleware):
         elif str(event.from_user.id) in ID_TEACHER or str(event.from_user.id) in ID_VOSP:
             if time_from <= datetime.now().time() <= time_to:
                 return await handler(event, data)
+            else:
+                await event.message.answer("Время записи уже закончилось")
