@@ -12,6 +12,8 @@ from icecream import ic
 def create_main_vosp_date_keyboard():
     today = datetime.datetime.now().date()
     weekday = today.weekday()
+    if weekday == 6:
+        weekday = 5
     weekdays = {
         0: [(today + datetime.timedelta(2))],  # "Среда " +
         1: [(today + datetime.timedelta(2))],  # "Четверг " +
@@ -147,8 +149,8 @@ def is_full_day(my_dict: dict, date: str) -> str:
         raise Exception("user_role must be Классный советник or Воспитатель")
     for time in listik:
         if is_full_time(my_dict, time) == "":
-            return ""
-    return "♻️ "
+            return "❌ "
+    return "✅ "
 
 
 def is_full_time(my_dict: dict, time: str) -> str:
@@ -158,8 +160,8 @@ def is_full_time(my_dict: dict, time: str) -> str:
     my_dict["time"] = time
     with rq:
         if rq.check_on_exist(my_dict):
-            return "♻️ "
-    return ""
+            return "✅ "
+    return "❌ "
 
 
 kb5 = ReplyKeyboardMarkup(resize_keyboard=True,
@@ -193,7 +195,7 @@ def take_changed_keyboard(keyboard: InlKB, call_data: CallbackQuery) -> InlKB:
     builder = InlineKeyboardBuilder()
     for elem in keyboard:
         if elem.callback_data == call_data:
-            builder.button(text=elem.text + " ✅",
+            builder.button(text=elem.text + " 🔸",
                            callback_data=elem.callback_data)
         else:
             builder.add(elem)

@@ -68,9 +68,9 @@ async def step_2_reaction(call: CallbackQuery, state: FSMContext):
     else:
         await state.set_state("already exist")
         if data["time"] == "Завтрак":
-            await call.message.answer(f'Эта запись уже существует "{res[0]}" \nВы хотите её заменить?', reply_markup=yes_no_keyboard)
+            await call.message.answer(f'Эта запись уже существует: "{res[0]}" \nВы хотите её заменить?', reply_markup=yes_no_keyboard)
         if data["time"] == "Полдник" or data["time"] == "Обед":
-            await call.message.answer(f'Эта запись уже существует : \nгород : {res[0]}\nинтернат : {res[1]} \nВы хотите её заменить?', reply_markup=yes_no_keyboard)
+            await call.message.answer(f'Эта запись уже существует: \nгород: {res[0]}\nинтернат: {res[1]} \nВы хотите её заменить?', reply_markup=yes_no_keyboard)
     await call.answer()
 
 

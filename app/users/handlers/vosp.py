@@ -87,7 +87,7 @@ async def step_2_reaction(call: CallbackQuery, state: FSMContext):
         await state.set_state(Form.num)
     else:
         await state.set_state("already exist")
-        await call.message.answer(f'Эта запись уже существует : {res[0]}\nВы хотите её заменить?', reply_markup=yes_no_keyboard)
+        await call.message.answer(f'Эта запись уже существует: {res[0]}\nВы хотите её заменить?', reply_markup=yes_no_keyboard)
     await call.answer()
 
 

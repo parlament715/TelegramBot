@@ -17,14 +17,14 @@ router = Router()
 @router.message(CommandStart(), FilterId(ID_MAIN_VOSP))
 async def first_keyboard_reaction(message: Message, state: FSMContext):
     await state.clear()
-    await message.answer('Для просмотра данных нажмите на предложенные варианты или введите их самостоятельно в таком формате : год-месяц-число.', reply_markup=create_main_vosp_date_keyboard())
+    await message.answer('Для просмотра данных нажмите на предложенные варианты или введите их самостоятельно в таком формате: число.месяц.год .', reply_markup=create_main_vosp_date_keyboard())
 
     await state.set_state("give_data")
 
 
 @router.message(F.text == "Посмотреть другую дату", FilterId(ID_MAIN_VOSP))
 async def first_keyboard_reaction(message: Message, state: FSMContext):
-    await message.answer('Для просмотра данных нажмите на предложенные варианты или введите их самостоятельно в таком формате : год-месяц-число.', reply_markup=create_main_vosp_date_keyboard())
+    await message.answer('Для просмотра данных нажмите на предложенные варианты или введите их самостоятельно в таком формате: число.месяц.год .', reply_markup=create_main_vosp_date_keyboard())
 
     await state.set_state("give_data")
 
@@ -45,7 +45,7 @@ async def state_give_data_reaction(message: Message, state: FSMContext):
             await bot.send_photo(chat_id=message.chat.id, photo=FSInputFile(path), reply_markup=kb_check_other_date)
         else:
             await bot.send_photo(chat_id=message.chat.id, photo=FSInputFile(path))
-    if res_docx != "Error":
+    if len(list_png):
         await bot.send_document(chat_id=message.chat.id, document=file)
     else:
-        await message.answer("Не получилось сформировать документ, недостаточно записей")
+        await message.answer("Не получилось сформировать документ, нет ни одной записи", reply_markup=kb_check_other_date)

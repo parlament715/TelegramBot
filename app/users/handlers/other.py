@@ -8,19 +8,19 @@ from app.users.objects_class import ID_TEACHER, ID_VOSP, ID_MAIN_VOSP
 router = Router()
 
 
-##################### /help ################
-@router.message(F.text == "/help", FilterId(ID_TEACHER + ID_VOSP))
-async def help_reaction_for_read(message: Message):
-    await message.answer(
-        'Для того чтобы посмотреть данные введите /start далее следуйте инструкциям. На этапе выбора даты можете ввести свою дату так и выбрать вариант из предложенных, в случае отсутствия записи вы получи сообщение : "Ошибка, этой таблицы скорее всего пустая". После каждого просмотра придётся вводить команду /start заново. Если возникли трудности обращайтесь в лс @paralment'
-    )
+# ##################### /help ################
+# @router.message(F.text == "/help", FilterId(ID_TEACHER + ID_VOSP))
+# async def help_reaction_for_read(message: Message):
+#     await message.answer(
+#         'Для того чтобы посмотреть данные введите /start далее следуйте инструкциям. На этапе выбора даты можете ввести свою дату так и выбрать вариант из предложенных, в случае отсутствия записи вы получи сообщение : "Ошибка, этой таблицы скорее всего пустая". После каждого просмотра придётся вводить команду /start заново. Если возникли трудности обращайтесь в лс @paralment'
+#     )
 
 
-@router.message(F.text == "/help", FilterId(ID_MAIN_VOSP))
-async def help_reaction_for_read(message: Message):
-    await message.answer(
-        'Для того чтобы занести данные вам нужно написать команду /start далее следовать согласно инструкциям, после каждой записи нужно заново прописывать команду /start'
-    )
+# @router.message(F.text == "/help", FilterId(ID_MAIN_VOSP))
+# async def help_reaction_for_read(message: Message):
+#     await message.answer(
+#         'Для того чтобы занести данные вам нужно написать команду /start далее следовать согласно инструкциям, после каждой записи нужно заново прописывать команду /start'
+#     )
 
 
 ############################ router #####################
