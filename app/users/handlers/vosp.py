@@ -15,27 +15,21 @@ from app.decorators import dc_change_keyboard
 router = Router()
 
 
-@router.callback_query(F.data == "No")
+@router.callback_query(F.data == "No", Filter_data("user_role", "Воспитатель"))
 async def call_back_data_reaction_No(call: CallbackQuery, state: FSMContext):
-    print(f"{call.from_user.id} - {call.from_user.full_name} - отказался от записи teacher")
+    print(f"{call.from_user.id} - {call.from_user.full_name} - отказался от записи vosp")
     await call.message.edit_text("Пожалуйста введите команду /start заново для записи")
     await state.clear()
     await call.answer()
 
 
-@router.callback_query(F.data == "Yes")
+@router.callback_query(F.data == "Yes", Filter_data("user_role", "Воспитатель"))
 async def call_back_data_reaction_Yes(call: CallbackQuery, state: FSMContext):
-    print(f"{call.from_user.id} - {call.from_user.full_name} - согласился на запись teacher")
+    print(f"{call.from_user.id} - {call.from_user.full_name} - согласился на запись vosp")
     await call.message.delete()
     await call.answer()
     data = await state.get_data()
-    if data["user_role"] == "Классный советник":
-        if data["time"] == "Завтрак":
-            await call.message.answer("Сколько человек (Напишите числом)")
-        elif data["time"] in ("Обед", "Полдник"):
-            await call.message.answer('Сколько человек (количество городских, через пробел количество интернатных)')
-    elif data["user_role"] == "Воспитатель":
-        await call.message.answer('Сколько человек (и 11 классников и 10 классников в сумме)')
+    await call.message.answer('Сколько человек (и 11 классников и 10 классников в сумме)')
     await state.set_state(Form.num)
 
 
@@ -43,7 +37,6 @@ async def call_back_data_reaction_Yes(call: CallbackQuery, state: FSMContext):
 async def second_keyboard_reaction(message: Message, state: FSMContext):
     print(f"{message.from_user.id} - {message.from_user.full_name} - начал запись VOSP")
     await state.clear()
-
     await state.update_data(user_name=find_user_name_by_id(message.from_user.id),
                             user_role='Воспитатель')
     data = await state.get_data()
