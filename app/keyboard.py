@@ -148,7 +148,7 @@ def is_full_day(my_dict: dict, date: str) -> str:
     else:
         raise Exception("user_role must be Классный советник or Воспитатель")
     for time in listik:
-        if is_full_time(my_dict, time) == "":
+        if is_full_time(my_dict, time) == "❌ ":
             return "❌ "
     return "✅ "
 
