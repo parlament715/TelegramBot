@@ -24,24 +24,13 @@ def create_main_vosp_date_keyboard():
         5: [(today + datetime.timedelta(3))],  # "Вторник " +
     }
     builder = ReplyKeyboardBuilder()
-    for i in range(4):
+    for i in range(3, -1, -1):
         date_list = weekdays[weekday]
         for date in date_list:
             date_i = date - datetime.timedelta(i)
             builder.add(KButton(text=weekday_date(date_i)))
     builder.adjust(1)
     return builder.as_markup(resize_keyboard=True)
-    kb_date_all = ReplyKeyboardMarkup(
-        resize_keyboard=True, keyboard=[[KButton(text=weekdays[today.weekday()])],
-                                        [KButton(
-                                            text=weekdays[(today - datetime.timedelta(1)).weekday()])],
-                                        [KButton(
-                                            text=weekdays[
-                                                (today - datetime.timedelta(2)).weekday()]
-                                        )
-        ]])
-
-    return kb_date_all
 
 
 def weekday_date(datetime_object: datetime) -> str:
@@ -156,7 +145,6 @@ def is_full_day(my_dict: dict, date: str) -> str:
 def is_full_time(my_dict: dict, time: str) -> str:
     date = my_dict["date"]
     name = my_dict["user_name"]
-    request.to_create(date)
     my_dict["time"] = time
     with rq:
         if rq.check_on_exist(my_dict):
