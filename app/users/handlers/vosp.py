@@ -3,7 +3,7 @@ from aiogram.filters import CommandStart, StateFilter
 from app.keyboard import create_date_keyboard_for_vosp, yes_no_keyboard, remove, gen_keyboard_time_for_vosp, kb5
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from loader import rq
+from loader import rq, bot
 from app.users.filter_class import FilterId, Filter_data
 from app.users.objects_class import ID_VOSP
 from icecream import ic
@@ -11,8 +11,37 @@ from app.users.objects_class import find_user_name_by_id
 from app.users.main_class import Form
 from app.users.handlers.other import rewrite_state_data
 from app.decorators import dc_change_keyboard
+from aiogram.types import FSInputFile
+from app.database.table import get_png_history
+import datetime
 
 router = Router()
+
+
+@router.message(FilterId(ID_VOSP), F.text == "/history")
+async def message_reaction_history(message: Message):
+    date_now = datetime.datetime.now()
+    weekday_now = date_now.weekday()
+    if weekday_now == 6:
+        await message.answer("Даты на заполнение отсутствуют")
+        return
+    weekdays = {
+        0: [("Среда", (date_now + datetime.timedelta(2)).strftime("%d.%m.%Y"))],
+        1: [("Четверг", (date_now + datetime.timedelta(2)).strftime("%d.%m.%Y"))],
+        2: [("Пятница", (date_now + datetime.timedelta(2)).strftime("%d.%m.%Y"))],
+        3: [("Суббота", (date_now + datetime.timedelta(2)).strftime("%d.%m.%Y")),
+            ("Воскресенье", (date_now + datetime.timedelta(3)).strftime("%d.%m.%Y"))],
+        4: [("Понедельник", (date_now + datetime.timedelta(3)).strftime("%d.%m.%Y"))],
+        5: [("Вторник", (date_now + datetime.timedelta(3)).strftime("%d.%m.%Y"))],
+    }
+    for weekday, date in weekdays[weekday_now]:
+        if get_png_history(find_user_name_by_id(
+                message.chat.id), "Воспитатель", date) is None:
+            await message.answer(f"У вас ещё нет записи на день недели {weekday.lower()}")
+        else:
+            file = FSInputFile("table_history.png")
+            await message.answer(weekday)
+            await bot.send_photo(message.chat.id, file)
 
 
 @router.callback_query(F.data == "No", Filter_data("user_role", "Воспитатель"))

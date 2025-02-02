@@ -3,10 +3,12 @@ from icecream import ic
 from typing import Union, Optional
 import logging
 from docxtpl import DocxTemplate
+import datetime
 
 
 class Request:
-    table_selector = {"Воспитатель": "vosp", "Классный советник": "teacher"}
+    table_selector = {"Воспитатель в": "vosp_sunday",
+                      "Воспитатель": "vosp", "Классный советник": "teacher"}
 
     def __init__(self, path: str):
         self.path = path
@@ -25,6 +27,16 @@ class Request:
         CREATE TABLE IF NOT EXISTS "vosp"(
         name STRING,
         breakfast INTEGER,
+        dinner INTEGER,
+        date TEXT
+        )
+        ''')
+        conn.execute('''
+        CREATE TABLE IF NOT EXISTS "vosp_sunday"(
+        name STRING,
+        breakfast INTEGER,
+        lunch INTEGER,
+        snack INTEGER,
         dinner INTEGER,
         date TEXT
         )
@@ -48,10 +60,10 @@ class Request:
             "Завтрак Воспитатель": "breakfast",
             "Обед Классный советник": "lunch_city",
             "Обед Классный советник dorm": "lunch_dorm",
-            "Обед Воспитатель": "lunch_dorm",
+            "Обед Воспитатель": "lunch",
             "Полдник Классный советник": "snack_city",
             "Полдник Классный советник dorm": "snack_dorm",
-            "Полдник Воспитатель": "snack_dorm",
+            "Полдник Воспитатель": "snack",
             "Ужин Воспитатель": "dinner",
         }  # меняем здесь
         _column_name = time + " " + role
@@ -68,8 +80,11 @@ class Request:
     def to_write(self, my_dict: dict):
         name = my_dict["user_name"]
         role = my_dict["user_role"]
-        table_name = Request.table_selector[role]
         my_date = my_dict['date']
+        p = ""
+        if datetime.datetime.strptime(my_date, "%d.%m.%Y").weekday() == 6:
+            p = " в"
+        table_name = Request.table_selector[my_dict["user_role"]+p]
         num = my_dict["num"].split()
         for (index, column_name) in enumerate(self.from_dict_to_name_column(my_dict)):
             res = self.cursor.execute(
@@ -88,7 +103,10 @@ class Request:
         name = my_dict["user_name"]
         my_date = my_dict["date"]
         time = my_dict["time"]
-        table_name = Request.table_selector[my_dict["user_role"]]
+        p = ""
+        if datetime.datetime.strptime(my_date, "%d.%m.%Y").weekday() == 6:
+            p = " в"
+        table_name = Request.table_selector[my_dict["user_role"]+p]
         res = []
         for time in self.from_dict_to_name_column(my_dict):
             a = self.cursor.execute(
