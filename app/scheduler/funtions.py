@@ -26,7 +26,7 @@ async def send_to_vosp(text):
 
 
 async def send_document():
-    day = (datetime.datetime.now() + datetime.timedelta(1)).strftime("%Y-%m-%d")
+    day = (datetime.datetime.now() + datetime.timedelta(1)).strftime("%d.%m.%Y")
     list_png = get_png(day)
     with rq:
         res_docx = rq.get_data_for_docx(day)
@@ -98,7 +98,7 @@ async def send_notifications_vosp():
 def is_full_days(my_dict: dict, listik: list):
     c = []
     for weekday, date in listik:
-        if not is_full_day(my_dict, str(date)):
+        if is_full_day(my_dict, date.strftime("%d.%m.%Y")) == "❌ ":
             c.append(weekday)
     if not c:
         return True
@@ -108,4 +108,4 @@ def is_full_days(my_dict: dict, listik: list):
 
 if __name__ == "__main__":
     import asyncio
-    asyncio.run(send_document())
+    asyncio.run(send_notifications_teacher())
