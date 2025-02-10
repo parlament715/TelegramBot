@@ -39,8 +39,8 @@ def get_png(date) -> Union[list]:
 
     # Создание DataFrame из данных
     if "table_class.png" in listik:
-        ic(data_class)
-        df_class = pd.DataFrame(data_class)
+        df_class = pd.DataFrame(data_class).replace(
+            "None", "Отсутствует")
         # Создание изображения таблицы и сохранение в формате PNG
         fig, ax = plt.subplots()
         ax.axis('off')  # Убираем оси координат
@@ -52,7 +52,8 @@ def get_png(date) -> Union[list]:
         plt.savefig('table_class.png', bbox_inches='tight', pad_inches=0.05)
 
     if "table_dorm.png" in listik:
-        df_dorm = pd.DataFrame(data_dorm)
+        df_dorm = pd.DataFrame(data_dorm).replace(
+            "None", "Отсутствует")
 
         # Создание изображения таблицы и сохранение в формате PNG
         fig, ax = plt.subplots()
@@ -115,11 +116,11 @@ def get_png_history(user_name: str, user_role: str, date: datetime):
         else:
             raise Exception(
                 "usee_role must be Воспитатель or Классный советник")
-        df_dorm = pd.DataFrame(data_hist)
+        df = pd.DataFrame(data_hist).replace("None", "Запись отсутствует")
         fig, ax = plt.subplots()
         ax.axis('off')  # Убираем оси координат
-        tabla = ax.table(cellText=df_dorm.values,
-                         colLabels=df_dorm.columns, loc='center')
+        tabla = ax.table(cellText=df.values,
+                         colLabels=df.columns, loc='center')
         tabla.auto_set_font_size(False)
         tabla.set_fontsize(12)
         tabla.scale(1.8, 1.5)
