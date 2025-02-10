@@ -104,7 +104,7 @@ class Request:
         my_date = my_dict["date"]
         time = my_dict["time"]
         p = ""
-        if datetime.datetime.strptime(my_date, "%d.%m.%Y").weekday() == 6:
+        if datetime.datetime.strptime(my_date, "%d.%m.%Y").weekday() == 6 and my_dict["user_role"] == "Воспитатель":
             p = " в"
         table_name = Request.table_selector[my_dict["user_role"]+p]
         res = []
@@ -146,7 +146,7 @@ class Request:
             "vosp", date, "breakfast") if x != "None"])
         dinner_dorm = sum([int(x) for x in self.to_read_db(
             "vosp", date, "dinner") if x != "None"])
-        year, month, day = map(int, date.split('.'))
+        day, month, year = map(int, date.split('.'))
         months_genitive = [
             'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
             'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'

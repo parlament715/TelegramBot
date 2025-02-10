@@ -147,8 +147,9 @@ def is_full_time(my_dict: dict, time: str) -> str:
     name = my_dict["user_name"]
     my_dict["time"] = time
     with rq:
-        if rq.check_on_exist(my_dict):
-            return "✅ "
+        res = rq.check_on_exist(my_dict)
+        if res:
+            return f"{" ".join(map(str, res))} "
     return "❌ "
 
 

@@ -13,6 +13,7 @@ from aiogram.types import FSInputFile
 from app.keyboard import is_full_day
 from app.users.objects_class import find_user_name_by_id
 from config import time_to
+from icecream import ic
 
 
 async def send_to_teacher(text):
@@ -41,6 +42,28 @@ async def send_document():
             await bot.send_document(chat_id=ID, document=file)
         else:
             await bot.send_message(ID, "Не получилось сформировать документ, недостаточно записей")
+
+
+def check_all_users(date: str):
+    passed_users = []
+    date = datetime.datetime.strptime(date, "%d.%M.%Y")
+    weekday = date.weekday()
+    listik = [(weekday, date)]
+    for id in ID_TEACHER:
+        name = find_user_name_by_id(id)
+        my_dict = {"user_name": name,
+                   "user_role": "Классный советник",
+                   }
+        if is_full_days(my_dict, listik) != True:
+            passed_users.append(name)
+    for id in ID_VOSP:
+        name = find_user_name_by_id(id)
+        my_dict = {"user_name": name,
+                   "user_role": "Воспитатель",
+                   }
+        if is_full_days(my_dict, listik) != True:
+            passed_users.append(name)
+    return passed_users
 
 
 async def send_notifications():
@@ -97,8 +120,9 @@ async def send_notifications_vosp():
 
 def is_full_days(my_dict: dict, listik: list):
     c = []
+    # print(listik)
     for weekday, date in listik:
-        if is_full_day(my_dict, date.strftime("%d.%m.%Y")) == "❌ ":
+        if is_full_day(my_dict, date.strftime("%d.%M.%Y")) == "❌ ":
             c.append(weekday)
     if not c:
         return True

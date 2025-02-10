@@ -10,6 +10,7 @@ from app.users.filter_class import FilterId
 from app.users.objects_class import ID_MAIN_VOSP
 from icecream import ic
 from app.users.main_class import Form
+from app.scheduler.funtions import check_all_users
 
 router = Router()
 
@@ -46,6 +47,12 @@ async def state_give_data_reaction(message: Message, state: FSMContext):
         else:
             await bot.send_photo(chat_id=message.chat.id, photo=FSInputFile(path))
     if len(list_png):
+        passed_users = check_all_users(message_text)
         await bot.send_document(chat_id=message.chat.id, document=file)
+        if passed_users:
+            if len(passed_users) == 1:
+                await message.answer(f"{passed_users[0]} не сделал запись")
+            else:
+                await message.answer(", ".join(passed_users) + " не сделали запись")
     else:
         await message.answer("Не получилось сформировать документ, нет ни одной записи", reply_markup=kb_check_other_date)
