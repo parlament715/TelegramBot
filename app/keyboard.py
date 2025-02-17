@@ -95,11 +95,14 @@ kb_check_other_date = ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
 
 
 def gen_keyboard_time_for_teacher(my_dict: dict) -> InlKB:
-    kb_time_for_teacher = InlKB(inline_keyboard=[[InKButton(text=is_full_time(my_dict, "Завтрак") + 'Завтрак',                        callback_data="Завтрак")],
-                                                 [InKButton(
-                                                     text=is_full_time(my_dict, "Обед") + 'Обед', callback_data="Обед")],
-                                                 [InKButton(text=is_full_time(my_dict, "Полдник") + 'Полдник',
-                                                            callback_data="Полдник")]
+    breakfast = is_full_time(my_dict, "Завтрак")
+    lunch = is_full_time(my_dict, "Обед")
+    snack = is_full_time(my_dict, "Полдник")
+    kb_time_for_teacher = InlKB(inline_keyboard=[[InKButton(text="✅  Завтрак "+breakfast if breakfast != "❌ " else "❌ Завтрак", callback_data='Завтрак')],
+                                                 [InKButton(text="✅  Обед "+lunch if lunch !=
+                                                            "❌ " else "❌ Обед", callback_data='Обед')],
+                                                 [InKButton(text="✅  Полдник "+snack if snack !=
+                                                            "❌ " else "❌ Полдник", callback_data='Полдник')]
                                                  ])
     return kb_time_for_teacher
 
@@ -107,18 +110,24 @@ def gen_keyboard_time_for_teacher(my_dict: dict) -> InlKB:
 def gen_keyboard_time_for_vosp(my_dict: dict) -> InlKB:
     date_obj = datetime.datetime.strptime(my_dict["date"], '%d.%m.%Y')
     if date_obj.weekday() == 6:
-        keyboard_0x002 = [[InKButton(text=is_full_time(my_dict, "Завтрак") + 'Завтрак', callback_data='Завтрак')],
-                          [InKButton(text=is_full_time(my_dict, "Обед") +
-                                     'Обед', callback_data='Обед')],
-                          [InKButton(text=is_full_time(my_dict, "Полдник") +
-                                     'Полдник', callback_data='Полдник')],
-                          [InKButton(text=is_full_time(my_dict, "Ужин") +
-                                     'Ужин', callback_data='Ужин')],
+        breakfast = is_full_time(my_dict, "Завтрак")
+        lunch = is_full_time(my_dict, "Обед")
+        snack = is_full_time(my_dict, "Полдник")
+        dinner = is_full_time(my_dict, "Ужин")
+        keyboard_0x002 = [[InKButton(text="✅  Завтрак "+breakfast if breakfast != "❌ " else "❌ Завтрак", callback_data='Завтрак')],
+                          [InKButton(text="✅  Обед "+lunch if lunch !=
+                                     "❌ " else "❌ Обед", callback_data='Обед')],
+                          [InKButton(text="✅  Полдник "+snack if snack !=
+                                     "❌ " else "❌ Полдник", callback_data='Полдник')],
+                          [InKButton(text="✅  Ужин "+dinner if dinner !=
+                                     "❌ " else "❌ Ужин", callback_data='Ужин')],
                           ]
     else:
-        keyboard_0x002 = [[InKButton(text=is_full_time(my_dict, "Завтрак") + 'Завтрак', callback_data='Завтрак')],
-                          [InKButton(text=is_full_time(my_dict, "Ужин") +
-                                     'Ужин', callback_data='Ужин')],
+        breakfast = is_full_time(my_dict, "Завтрак")
+        dinner = is_full_time(my_dict, "Ужин")
+        keyboard_0x002 = [[InKButton(text="✅  Завтрак "+breakfast if breakfast != "❌ " else "❌ Завтрак", callback_data='Завтрак')],
+                          [InKButton(text="✅  Ужин "+dinner if dinner !=
+                                     "❌ " else "❌ Ужин", callback_data='Ужин')],
                           ]
 
     return InlKB(inline_keyboard=keyboard_0x002)
@@ -149,7 +158,7 @@ def is_full_time(my_dict: dict, time: str) -> str:
     with rq:
         res = rq.check_on_exist(my_dict)
         if res:
-            return f"{" ".join(map(str, res))} "
+            return f"({"/".join(map(str, res))})"
     return "❌ "
 
 

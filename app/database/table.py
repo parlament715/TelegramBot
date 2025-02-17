@@ -116,7 +116,7 @@ def get_png_history(user_name: str, user_role: str, date: datetime):
         else:
             raise Exception(
                 "usee_role must be Воспитатель or Классный советник")
-        df = pd.DataFrame(data_hist).replace("None", "Запись отсутствует")
+        df = pd.DataFrame(data_hist).replace("None", "Отсутствует")
         fig, ax = plt.subplots()
         ax.axis('off')  # Убираем оси координат
         tabla = ax.table(cellText=df.values,
