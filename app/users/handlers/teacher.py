@@ -20,6 +20,11 @@ import datetime
 router = Router()
 
 
+@router.message(CommandStart(), FilterId(ID_TEACHER))
+async def help_reaction(message: Message, state: FSMContext):
+    await message.answer("/new - новая запись\n/history - посмотреть историю записи\nЕсли что-то не работает просьба сообщить об этом мне @parlament34")
+
+
 @router.message(FilterId(ID_TEACHER), F.text == "/history")
 async def message_reaction_history(message: Message):
     date_now = datetime.datetime.now()
@@ -45,7 +50,7 @@ async def message_reaction_history(message: Message):
             await bot.send_photo(message.chat.id, file)
 
 
-@router.message(FilterId(ID_TEACHER), CommandStart())
+@router.message(FilterId(ID_TEACHER), F.text == "/new")
 async def second_keyboard_reaction(message: Message, state: FSMContext):
     print(f"{message.from_user.id} - {message.from_user.full_name} - начал запись teacher")
     await state.clear()
@@ -140,7 +145,7 @@ async def step_3_reaction(message: Message, state: FSMContext):
 @router.callback_query(F.data == "No", Filter_data("user_role", "Классный советник"))
 async def call_back_data_reaction_No(call: CallbackQuery, state: FSMContext):
     print(f"{call.from_user.id} - {call.from_user.full_name} - отказался от записи teacher")
-    await call.message.edit_text("Пожалуйста введите команду /start заново для записи")
+    await call.message.edit_text("Пожалуйста введите команду /new заново для записи")
     await state.clear()
     await call.answer()
 

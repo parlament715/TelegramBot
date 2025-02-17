@@ -18,6 +18,11 @@ import datetime
 router = Router()
 
 
+@router.message(CommandStart(), FilterId(ID_VOSP))
+async def help_reaction(message: Message, state: FSMContext):
+    await message.answer("/new - новая запись\n/history - посмотреть историю записи\nЕсли что-то не работает просьба сообщить об этом мне @parlament34")
+
+
 @router.message(FilterId(ID_VOSP), F.text == "/history")
 async def message_reaction_history(message: Message):
     date_now = datetime.datetime.now()
@@ -47,7 +52,7 @@ async def message_reaction_history(message: Message):
 @router.callback_query(F.data == "No", Filter_data("user_role", "Воспитатель"))
 async def call_back_data_reaction_No(call: CallbackQuery, state: FSMContext):
     print(f"{call.from_user.id} - {call.from_user.full_name} - отказался от записи vosp")
-    await call.message.edit_text("Пожалуйста введите команду /start заново для записи")
+    await call.message.edit_text("Пожалуйста введите команду /new заново для записи")
     await state.clear()
     await call.answer()
 
@@ -62,7 +67,7 @@ async def call_back_data_reaction_Yes(call: CallbackQuery, state: FSMContext):
     await state.set_state(Form.num)
 
 
-@router.message(FilterId(ID_VOSP), CommandStart())
+@router.message(FilterId(ID_VOSP), F.text == "/new")
 async def second_keyboard_reaction(message: Message, state: FSMContext):
     print(f"{message.from_user.id} - {message.from_user.full_name} - начал запись VOSP")
     await state.clear()
