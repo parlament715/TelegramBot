@@ -162,9 +162,9 @@ def is_full_time(my_dict: dict, time: str) -> str:
     return "❌ "
 
 
-kb5 = ReplyKeyboardMarkup(resize_keyboard=True,
-                          keyboard=[[KButton(text='Записать на ЭТУ ЖЕ дату')],
-                                    [KButton(text="Записать на ДРУГУЮ дату")]])
+kb5 = InlKB(
+    inline_keyboard=[[InKButton(text='Записать на ЭТУ ЖЕ дату', callback_data="same date")],
+                     [InKButton(text="Записать на ДРУГУЮ дату", callback_data="another date")]])
 
 remove = ReplyKeyboardRemove()
 

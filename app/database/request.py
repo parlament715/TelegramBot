@@ -41,6 +41,12 @@ class Request:
         date TEXT
         )
         ''')
+        conn.execute('''
+        CREATE TABLE IF NOT EXISTS "delmsgid"(
+        msg_id INTEGER,
+        chat_id INTEGER
+        )
+        ''')
 
     def __enter__(self):
         self.conn = sqlite3.connect(self.path)

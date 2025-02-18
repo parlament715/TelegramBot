@@ -26,3 +26,4 @@ def add_job_scheduler(scheduler):
                       minute=1)
     scheduler.add_job(send_notifications_teacher, "cron", day_of_week="0-5", hour=13,
                       minute=6)
+    scheduler.add_job(del_message, "cron", hour=21, minute=2)

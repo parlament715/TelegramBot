@@ -133,29 +133,35 @@ async def step_3_reaction(message: Message, state: FSMContext):
             with rq:
                 rq.to_write(data)
             await state.set_state('chose')
-            await message.answer("Успешно сохранено", reply_markup=kb5)
+            msg = await message.answer("Успешно сохранено", reply_markup=kb5)
+            with rq as cursor:
+                cursor.execute(
+                    """INSERT INTO "delmsgid" (msg_id,chat_id) VALUES (?,?)""", (msg.message_id, msg.chat.id))
+            await state.update_data(last_kb=kb5)
         except ValueError:
             await state.set_state(Form.num)
             await message.answer("Некорректный  формат, пожалуйста введите ещё раз одно ЧИСЛО - общее количество питающихся", reply_markup=remove)
 
 
-@router.message(F.text == "Записать на ЭТУ ЖЕ дату", StateFilter("chose"), FilterId(ID_VOSP))
-async def same_date_reaction_teacher(message: Message, state: FSMContext):
-    print(f"{message.from_user.id} - {message.from_user.full_name} - хочет записаться на ту же дату VOSP")
+@router.callback_query(F.data == "same date", StateFilter("chose"), FilterId(ID_VOSP))
+@dc_change_keyboard(previous_name="call")
+async def same_date_reaction_teacher(call: CallbackQuery, state: FSMContext):
+    print(f"{call.message.from_user.id} - {call.message.from_user.full_name} - хочет записаться на ту же дату VOSP")
     await rewrite_state_data(state, "same")
     data = await state.get_data()
     kb = gen_keyboard_time_for_vosp(data)
+    await call.message.answer("Выберете время", reply_markup=kb)
     await state.update_data(last_kb=kb)
-    await message.answer("Выберете время", reply_markup=kb)
     await state.set_state(Form.time)
 
 
-@router.message(F.text == "Записать на ДРУГУЮ дату", StateFilter("chose"), FilterId(ID_VOSP))
-async def other_date_reaction_teacher(message: Message, state: FSMContext):
-    print(f"{message.from_user.id} - {message.from_user.full_name} - хочет записаться на другую дату VOSP")
+@router.callback_query(F.data == "another date", StateFilter("chose"), FilterId(ID_VOSP))
+@dc_change_keyboard(previous_name="call")
+async def other_date_reaction_teacher(call: CallbackQuery, state: FSMContext):
+    print(f"{call.message.from_user.id} - {call.message.from_user.full_name} - хочет записаться на другую дату VOSP")
     await rewrite_state_data(state, "other")
     data = await state.get_data()
     kb = create_date_keyboard_for_vosp(data)
     await state.update_data(last_kb=kb)
-    await message.answer('Выберете дату', reply_markup=kb)
+    await call.message.answer('Выберете дату', reply_markup=kb)
     await state.set_state(Form.date)

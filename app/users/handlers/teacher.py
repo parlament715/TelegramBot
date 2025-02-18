@@ -119,7 +119,11 @@ async def step_3_reaction(message: Message, state: FSMContext):
                 with rq:
                     rq.to_write(data)
                 await state.set_state('chose Teacher')
-                await message.answer("Успешно сохранено", reply_markup=kb5)
+                msg = await message.answer("Успешно сохранено", reply_markup=kb5)
+                with rq as cursor:
+                    cursor.execute(
+                        """INSERT INTO "delmsgid" (msg_id,chat_id) VALUES (?,?)""", (msg.message_id, msg.chat.id))
+                await state.update_data(last_kb=kb5)
             else:
                 await state.set_state(Form.num)
                 await message.answer("Некорректный  формат, пожалуйста введите ещё раз два числа через пробел  в указанном формате", reply_markup=remove)
@@ -136,7 +140,12 @@ async def step_3_reaction(message: Message, state: FSMContext):
             data = await state.get_data()
             with rq:
                 rq.to_write(data)
-            await message.answer("Успешно сохранено", reply_markup=kb5)
+            await state.set_state('chose Teacher')
+            msg = await message.answer("Успешно сохранено", reply_markup=kb5)
+            with rq as cursor:
+                cursor.execute(
+                    """INSERT INTO "delmsgid" (msg_id,chat_id) VALUES (?,?)""", (msg.message_id, msg.chat.id))
+            await state.update_data(last_kb=kb5)
             await state.set_state('chose Teacher')
         except ValueError:
             await message.answer("Некорректный  формат, пожалуйста введите еще раз ЧИСЛО")
@@ -163,23 +172,25 @@ async def call_back_data_reaction_Yes(call: CallbackQuery, state: FSMContext):
     await state.set_state(Form.num)
 
 
-@router.message(F.text == "Записать на ЭТУ ЖЕ дату", StateFilter("chose Teacher"))
-async def same_date_reaction_teacher(message: Message, state: FSMContext):
-    print(f"{message.from_user.id} - {message.from_user.full_name} - хочет записаться на ту же дату teacher")
+@router.callback_query(F.data == "same date", StateFilter("chose Teacher"))
+@dc_change_keyboard(previous_name="call")
+async def same_date_reaction_teacher(call: CallbackQuery, state: FSMContext):
+    print(f"{call.message.from_user.id} - {call.message.from_user.full_name} - хочет записаться на ту же дату teacher")
     await rewrite_state_data(state, "same")
     data = await state.get_data()
     kb = gen_keyboard_time_for_teacher(data)
     await state.update_data(last_kb=kb)
-    await message.answer("Выберете время", reply_markup=kb)
+    await call.message.answer("Выберете время", reply_markup=kb)
     await state.set_state(Form.time)
 
 
-@router.message(F.text == "Записать на ДРУГУЮ дату", StateFilter("chose Teacher"))
-async def other_date_reaction_teacher(message: Message, state: FSMContext):
-    print(f"{message.from_user.id} - {message.from_user.full_name} - хочет записаться на другую дату teacher")
+@router.callback_query(F.data == "another date", StateFilter("chose Teacher"))
+@dc_change_keyboard(previous_name="call")
+async def other_date_reaction_teacher(call: CallbackQuery, state: FSMContext):
+    print(f"{call.message.from_user.id} - {call.message.from_user.full_name} - хочет записаться на другую дату teacher")
     await rewrite_state_data(state, "other")
     data = await state.get_data()
     kb = create_date_keyboard_for_teacher(data)
     await state.update_data(last_kb=kb)
-    await message.answer('Выберете дату', reply_markup=kb)
+    await call.message.answer('Выберете дату', reply_markup=kb)
     await state.set_state(Form.date)

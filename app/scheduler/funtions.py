@@ -4,6 +4,8 @@ if __name__ == "__main__":
     from icecream import ic
     # icecream.ic(str(Path(__file__).resolve().parents[2]))
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    from app.database.request import Request
+    rq = Request("request.db")
 
 from loader import bot, rq
 from app.users.objects_class import ID_TEACHER, ID_MAIN_VOSP, ID_VOSP
@@ -130,6 +132,17 @@ def is_full_days(my_dict: dict, listik: list):
         return c
 
 
+async def del_message():
+    with rq as cursor:
+        a = cursor.execute("""SELECT * FROM "delmsgid" """).fetchall()
+        for msg_id, chat_id in a:
+            try:
+                await bot.delete_message(message_id=msg_id, chat_id=chat_id)
+            except:
+                pass
+        cursor.execute(""" DELETE FROM "delmsgid" """)
+
+
 if __name__ == "__main__":
     import asyncio
-    asyncio.run(send_notifications_teacher())
+    asyncio.run(del_message())
