@@ -48,7 +48,7 @@ async def send_document():
 
 def check_all_users(date: str):
     passed_users = []
-    date = datetime.datetime.strptime(date, "%d.%M.%Y")
+    date = datetime.datetime.strptime(date, "%d.%m.%Y")
     weekday = date.weekday()
     listik = [(weekday, date)]
     for id in ID_TEACHER:
@@ -124,7 +124,7 @@ def is_full_days(my_dict: dict, listik: list):
     c = []
     # print(listik)
     for weekday, date in listik:
-        if is_full_day(my_dict, date.strftime("%d.%M.%Y")) == "❌ ":
+        if is_full_day(my_dict, date.strftime("%d.%m.%Y")) == "❌ ":
             c.append(weekday)
     if not c:
         return True
