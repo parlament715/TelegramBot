@@ -54,7 +54,7 @@ async def state_give_data_reaction(message: Message, state: FSMContext):
             if name not in d.keys():
                 d[name] = [[official_name], passed_time]
             else:
-                assert passed_time != d[name][1], "passed_time not equal"
+                assert passed_time == d[name][1], "passed_time not equal"
                 d[name] = [d[name][0]+[official_name], passed_time]
         for name in d.keys():
             ic(d[name])
