@@ -26,7 +26,6 @@ async def first_keyboard_reaction(message: Message, state: FSMContext):
 @router.message(F.text == "Посмотреть другую дату", FilterId(ID_MAIN_VOSP))
 async def first_keyboard_reaction(message: Message, state: FSMContext):
     await message.answer('Для просмотра данных нажмите на предложенные варианты или введите их самостоятельно в таком формате: число.месяц.год .', reply_markup=create_main_vosp_date_keyboard())
-
     await state.set_state("give_data")
 
 
@@ -49,10 +48,18 @@ async def state_give_data_reaction(message: Message, state: FSMContext):
     if len(list_png):
         passed_users = check_all_users(message_text)
         await bot.send_document(chat_id=message.chat.id, document=file)
-        if passed_users:
-            if len(passed_users) == 1:
-                await message.answer(f"{passed_users[0]} не сделал запись")
+        text = "Пропустили:\n"
+        d = dict()
+        for name, official_name, passed_time in passed_users:
+            if name not in d.keys():
+                d[name] = [[official_name], passed_time]
             else:
-                await message.answer(", ".join(passed_users) + " не сделали запись")
+                assert passed_time != d[name][1], "passed_time not equal"
+                d[name] = [d[name][0]+[official_name], passed_time]
+        for name in d.keys():
+            ic(d[name])
+            text += f"{name} ({", ".join(d[name][0])}) : {", ".join(d[name][1])}\n"
+        await message.answer(text, reply_markup=kb_check_other_date)
+
     else:
         await message.answer("Не получилось сформировать документ, нет ни одной записи", reply_markup=kb_check_other_date)

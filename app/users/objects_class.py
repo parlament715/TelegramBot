@@ -21,6 +21,12 @@ def find_user_name_by_id(user_id):
     return None
 
 
+def find_official_name_by_id(user_id):
+    for user in all_list:
+        if user["id"] == str(user_id):
+            return user["official_name"]
+
+
 def find_user_classroom_number_by_id(user_id):
     for user in all_list:
         if user["id"] == str(user_id):

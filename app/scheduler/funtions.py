@@ -12,8 +12,8 @@ from app.users.objects_class import ID_TEACHER, ID_MAIN_VOSP, ID_VOSP
 import datetime
 from app.database.table import get_png
 from aiogram.types import FSInputFile
-from app.keyboard import is_full_day
-from app.users.objects_class import find_user_name_by_id
+from app.keyboard import is_full_day, is_full_time
+from app.users.objects_class import find_user_name_by_id, find_official_name_by_id
 from config import time_to
 from icecream import ic
 
@@ -48,23 +48,25 @@ async def send_document():
 
 def check_all_users(date: str):
     passed_users = []
-    date = datetime.datetime.strptime(date, "%d.%m.%Y")
-    weekday = date.weekday()
-    listik = [(weekday, date)]
+    # date = datetime.datetime.strptime(date, "%d.%m.%Y")
     for id in ID_TEACHER:
         name = find_user_name_by_id(id)
+        official_name = find_official_name_by_id(id)
         my_dict = {"user_name": name,
                    "user_role": "Классный советник",
                    }
-        if is_full_days(my_dict, listik) != True:
-            passed_users.append(name)
+        if is_full_day(my_dict, date) != "✅ ":
+            passed_users.append(
+                (name, official_name, is_full_day_list(my_dict, date)))
     for id in ID_VOSP:
         name = find_user_name_by_id(id)
+        official_name = find_official_name_by_id(id)
         my_dict = {"user_name": name,
                    "user_role": "Воспитатель",
                    }
-        if is_full_days(my_dict, listik) != True:
-            passed_users.append(name)
+        if is_full_day(my_dict, date) != "✅ ":
+            passed_users.append(
+                (name, official_name, is_full_day_list(my_dict, date)))
     return passed_users
 
 
@@ -130,6 +132,25 @@ def is_full_days(my_dict: dict, listik: list):
         return True
     else:
         return c
+
+
+def is_full_day_list(my_dict: dict, date: str) -> list:
+    date_obj = datetime.datetime.strptime(date, '%d.%m.%Y')
+    my_dict["date"] = date
+    c = []
+    if my_dict["user_role"] == "Воспитатель":
+        if date_obj.weekday() == 6:
+            listik = ['Завтрак', 'Обед', 'Полдник', 'Ужин']
+        else:
+            listik = ["Завтрак", "Ужин"]
+    elif my_dict["user_role"] == "Классный советник":
+        listik = ["Завтрак", "Обед", "Полдник"]
+    else:
+        raise Exception("user_role must be Классный советник or Воспитатель")
+    for time in listik:
+        if is_full_time(my_dict, time) == "❌ ":
+            c.append(time)
+    return c
 
 
 async def del_message():
