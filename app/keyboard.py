@@ -14,21 +14,10 @@ def create_main_vosp_date_keyboard():
     weekday = today.weekday()
     if weekday == 6:
         weekday = 5
-    weekdays = {
-        0: [(today + datetime.timedelta(2))],  # "Среда " +
-        1: [(today + datetime.timedelta(2))],  # "Четверг " +
-        2: [(today + datetime.timedelta(2))],  # "Пятница " +
-        3: [(today + datetime.timedelta(2)),  # "Суббота " +
-            (today + datetime.timedelta(3))],  # "Воскресенье " +
-        4: [(today + datetime.timedelta(3))],  # "Понедельник " +
-        5: [(today + datetime.timedelta(3))],  # "Вторник " +
-    }
     builder = ReplyKeyboardBuilder()
-    for i in range(3, -1, -1):
-        date_list = weekdays[weekday]
-        for date in date_list:
-            date_i = date - datetime.timedelta(i)
-            builder.add(KButton(text=weekday_date(date_i)))
+    for i in range(5, -1, -1):
+        builder.add(KButton(text=weekday_date(
+            today+datetime.timedelta(4)-datetime.timedelta(i))))
     builder.adjust(1)
     return builder.as_markup(resize_keyboard=True)
 
