@@ -103,6 +103,7 @@ def gen_keyboard_time_for_vosp(my_dict: dict) -> InlKB:
         lunch = is_full_time(my_dict, "Обед")
         snack = is_full_time(my_dict, "Полдник")
         dinner = is_full_time(my_dict, "Ужин")
+        last_dinner = is_full_time(my_dict, "Паужин")
         keyboard_0x002 = [[InKButton(text="✅  Завтрак "+breakfast if breakfast != "❌ " else "❌ Завтрак", callback_data='Завтрак')],
                           [InKButton(text="✅  Обед "+lunch if lunch !=
                                      "❌ " else "❌ Обед", callback_data='Обед')],
@@ -110,13 +111,18 @@ def gen_keyboard_time_for_vosp(my_dict: dict) -> InlKB:
                                      "❌ " else "❌ Полдник", callback_data='Полдник')],
                           [InKButton(text="✅  Ужин "+dinner if dinner !=
                                      "❌ " else "❌ Ужин", callback_data='Ужин')],
+                          [InKButton(text="✅  Паужин " + last_dinner if last_dinner !=
+                                     "❌ " else "❌ Паужин", callback_data='Паужин')]
                           ]
     else:
         breakfast = is_full_time(my_dict, "Завтрак")
         dinner = is_full_time(my_dict, "Ужин")
+        last_dinner = is_full_time(my_dict, "Паужин")
         keyboard_0x002 = [[InKButton(text="✅  Завтрак "+breakfast if breakfast != "❌ " else "❌ Завтрак", callback_data='Завтрак')],
-                          [InKButton(text="✅  Ужин "+dinner if dinner !=
+                          [InKButton(text="✅  Ужин " + dinner if dinner !=
                                      "❌ " else "❌ Ужин", callback_data='Ужин')],
+                          [InKButton(text="✅  Паужин " + last_dinner if last_dinner !=
+                                     "❌ " else "❌ Паужин", callback_data='Паужин')]
                           ]
 
     return InlKB(inline_keyboard=keyboard_0x002)

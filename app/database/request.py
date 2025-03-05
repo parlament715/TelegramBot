@@ -28,6 +28,7 @@ class Request:
         name STRING,
         breakfast INTEGER,
         dinner INTEGER,
+        last_dinner INTEGER,
         date TEXT
         )
         ''')
@@ -38,6 +39,7 @@ class Request:
         lunch INTEGER,
         snack INTEGER,
         dinner INTEGER,
+        last_dinner INTEGER,
         date TEXT
         )
         ''')
@@ -71,6 +73,7 @@ class Request:
             "Полдник Классный советник dorm": "snack_dorm",
             "Полдник Воспитатель": "snack",
             "Ужин Воспитатель": "dinner",
+            "Паужин Воспитатель": "last_dinner"
         }  # меняем здесь
         _column_name = time + " " + role
         if time == "Завтрак":
@@ -108,7 +111,6 @@ class Request:
     def check_on_exist(self, my_dict: dict) -> Union[list, None]:
         name = my_dict["user_name"]
         my_date = my_dict["date"]
-        time = my_dict["time"]
         p = ""
         if datetime.datetime.strptime(my_date, "%d.%m.%Y").weekday() == 6 and my_dict["user_role"] == "Воспитатель":
             p = " в"
@@ -137,40 +139,71 @@ class Request:
         return b
 
     def get_data_for_docx(self, date: str) -> dict:
-        breakfast_city = sum([int(x) for x in self.to_read_db(
-            "teacher", date, "breakfast") if x != "None"])
-        lunch_dorm = sum([int(x) for x in self.to_read_db(
-            "teacher", date, "lunch_dorm") if x != "None"])
-        lunch_city = sum([int(x) for x in self.to_read_db(
-            "teacher", date, "lunch_city") if x != "None"])
-        snack_dorm = sum([int(x) for x in self.to_read_db(
-            "teacher", date, "snack_dorm") if x != "None"])
-        snack_city = sum([int(x) for x in self.to_read_db(
-            "teacher", date, "snack_city") if x != "None"])
-
-        breakfast_dorm = sum([int(x) for x in self.to_read_db(
-            "vosp", date, "breakfast") if x != "None"])
-        dinner_dorm = sum([int(x) for x in self.to_read_db(
-            "vosp", date, "dinner") if x != "None"])
-        day, month, year = map(int, date.split('.'))
         months_genitive = [
             'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
             'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
         ]
-        month = months_genitive[month - 1]
-        content = {
-            "data_num": str(day),
-            "data_month": month,
-            "data_year": str(year),
-            "a": str(breakfast_city),
-            "b": str(breakfast_dorm),
-            "c": str(lunch_city),
-            "d": str(lunch_dorm),
-            "e": str(snack_city),
-            "f": str(snack_dorm),
-            "g": "0",
-            "h": str(dinner_dorm),
-        }
+        if datetime.datetime.strptime(date, "%d.%m.%Y").weekday() == 6:
+            breakfast_dorm = sum([int(x) for x in self.to_read_db(
+                "vosp_sunday", date, "breakfast") if x != "None"])
+            lunch_dorm = sum([int(x) for x in self.to_read_db(
+                "vosp_sunday", date, "lunch") if x != "None"])
+            snack_dorm = sum([int(x) for x in self.to_read_db(
+                "vosp_sunday", date, "snack") if x != "None"])
+            breakfast_dorm = sum([int(x) for x in self.to_read_db(
+                "vosp_sunday", date, "breakfast") if x != "None"])
+            dinner_dorm = sum([int(x) for x in self.to_read_db(
+                "vosp_sunday", date, "dinner") if x != "None"])
+            last_dinner_dorm = sum([int(x) for x in self.to_read_db(
+                "vosp_sunday", date, "last_dinner") if x != "None"])
+            day, month, year = map(int, date.split('.'))
+            month = months_genitive[month - 1]
+            content = {
+                "data_num": str(day),
+                "data_month": month,
+                "data_year": str(year),
+                "a": "0",
+                "b": str(breakfast_dorm),
+                "c": "0",
+                "d": str(lunch_dorm),
+                "e": "0",
+                "f": str(snack_dorm),
+                "g": "0",
+                "h": str(last_dinner_dorm),
+            }
+        else:
+            breakfast_city = sum([int(x) for x in self.to_read_db(
+                "teacher", date, "breakfast") if x != "None"])
+            lunch_dorm = sum([int(x) for x in self.to_read_db(
+                "teacher", date, "lunch_dorm") if x != "None"])
+            lunch_city = sum([int(x) for x in self.to_read_db(
+                "teacher", date, "lunch_city") if x != "None"])
+            snack_dorm = sum([int(x) for x in self.to_read_db(
+                "teacher", date, "snack_dorm") if x != "None"])
+            snack_city = sum([int(x) for x in self.to_read_db(
+                "teacher", date, "snack_city") if x != "None"])
+            breakfast_dorm = sum([int(x) for x in self.to_read_db(
+                "vosp", date, "breakfast") if x != "None"])
+            dinner_dorm = sum([int(x) for x in self.to_read_db(
+                "vosp", date, "dinner") if x != "None"])
+            last_dinner_dorm = sum([int(x) for x in self.to_read_db(
+                "vosp", date, "last_dinner") if x != "None"])
+            day, month, year = map(int, date.split('.'))
+
+            month = months_genitive[month - 1]
+            content = {
+                "data_num": str(day),
+                "data_month": month,
+                "data_year": str(year),
+                "a": str(breakfast_city),
+                "b": str(breakfast_dorm),
+                "c": str(lunch_city),
+                "d": str(lunch_dorm),
+                "e": str(snack_city),
+                "f": str(snack_dorm),
+                "g": "0",
+                "h": str(last_dinner_dorm),
+            }
         fill_template("example.docx", "docx.docx", content)
 
 

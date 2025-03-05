@@ -11,7 +11,11 @@ def get_png(date) -> Union[list]:
     # Создание данных для таблицы
     listik = []
     with rq:
-        data_name_dorm = rq.to_read_db("vosp", date, "name")
+        if datetime.strptime(date, "%d.%m.%Y").weekday() == 6:
+            vosp_table_name = "vosp_sunday"
+        else:
+            vosp_table_name = "vosp"
+        data_name_dorm = rq.to_read_db(vosp_table_name, date, "name")
         data_name_class = rq.to_read_db("teacher", date, "name")
 
         if data_name_class != []:
@@ -30,11 +34,25 @@ def get_png(date) -> Union[list]:
 
         if data_name_dorm != []:
             listik.append("table_dorm.png")
-            data_breakfast_dorm = rq.to_read_db("vosp", date, "breakfast")
-            data_dinner_dorm = rq.to_read_db("vosp", date, "dinner")
-            data_dorm = {'Название': data_name_dorm,
-                         'Завтрак': data_breakfast_dorm,
-                         'Ужин': data_dinner_dorm, }
+            data_breakfast_dorm = rq.to_read_db(
+                vosp_table_name, date, "breakfast")
+            data_dinner_dorm = rq.to_read_db(vosp_table_name, date, "dinner")
+            data_last_dinner_dorm = rq.to_read_db(
+                vosp_table_name, date, "last_dinner")
+            if datetime.strptime(date, "%d.%m.%Y").weekday() == 6:
+                data_lunch_dorm = rq.to_read_db(vosp_table_name, date, "lunch")
+                data_snack_dorm = rq.to_read_db(vosp_table_name, date, "snack")
+                data_dorm = {'Название': data_name_dorm,
+                             'Завтрак': data_breakfast_dorm,
+                             "Обед": data_breakfast_dorm,
+                             "Полдник": data_snack_dorm,
+                             'Ужин': data_dinner_dorm,
+                             "Паужин": data_last_dinner_dorm}
+            else:
+                data_dorm = {'Название': data_name_dorm,
+                             'Завтрак': data_breakfast_dorm,
+                             'Ужин': data_dinner_dorm,
+                             "Паужин": data_last_dinner_dorm}
         # Если таблица пустая то return Error
 
     # Создание DataFrame из данных
@@ -82,10 +100,13 @@ def get_png_history(user_name: str, user_role: str, date: datetime):
                     "vosp_sunday", date, "snack", f'name = "{user_name}"')
                 data_dinner = rq.to_read_db(
                     "vosp_sunday", date, "dinner", f'name = "{user_name}"')
+                data_last_dinner = rq.to_read_db(
+                    "vosp_sunday", date, "last_dinner", f'name = "{user_name}"')
                 data_hist = {'Завтрак': data_breakfast,
                              'Обед': data_lunch,
                              'Полдник': data_snack,
-                             'Ужин': data_dinner, }
+                             'Ужин': data_dinner,
+                             "Паужин": data_last_dinner}
             else:
                 if len(rq.to_read_db("vosp", date, "name", f'name = "{user_name}"')) == 0:
                     return
@@ -93,8 +114,11 @@ def get_png_history(user_name: str, user_role: str, date: datetime):
                     "vosp", date, "breakfast", f'name = "{user_name}"')
                 data_dinner_dorm = rq.to_read_db(
                     "vosp", date, "dinner", f'name = "{user_name}"')
+                data_last_dinner = rq.to_read_db(
+                    "vosp", date, "last_dinner", f'name = "{user_name}"')
                 data_hist = {'Завтрак': data_breakfast_dorm,
-                             'Ужин': data_dinner_dorm, }
+                             'Ужин': data_dinner_dorm,
+                             "Паужин": data_last_dinner}
         elif user_role == "Классный советник":
             if len(rq.to_read_db("teacher", date, "name", f'name = "{user_name}"')) == 0:
                 return
