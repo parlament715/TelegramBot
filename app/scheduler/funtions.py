@@ -16,16 +16,33 @@ from app.keyboard import is_full_day, is_full_time
 from app.users.objects_class import find_user_name_by_id, find_official_name_by_id
 from config import time_to
 from icecream import ic
+import logging
+from aiogram.exceptions import TelegramForbiddenError
+logger = logging.getLogger(__name__)
+handler = logging.FileHandler(
+    f"{__name__}.log", mode='w', encoding="UTF-8")
+formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.INFO)
 
 
 async def send_to_teacher(text):
     for ID in ID_TEACHER:
-        await bot.send_message(ID, text)
+        try:
+            await bot.send_message(ID, text)
+        except TelegramForbiddenError:
+            logger.log(
+                logging.WARNING, f"{find_official_name_by_id(ID)} ({find_user_name_by_id(ID)}) {ID} - заблокировал бота")
 
 
 async def send_to_vosp(text):
     for ID in ID_VOSP:
-        await bot.send_message(ID, text)
+        try:
+            await bot.send_message(ID, text)
+        except TelegramForbiddenError:
+            logger.log(
+                logging.WARNING, f"{find_official_name_by_id(ID)} ({find_user_name_by_id(ID)}) {ID} - заблокировал бота")
 
 
 async def send_document():
@@ -95,7 +112,11 @@ async def send_notifications_teacher():
                    }
         a = is_full_days(my_dict, listik)
         if a != True:  # если не полный день
-            await bot.send_message(id, f"У вас не заполнены дни :\n{" ".join(a)}\nПожалуйста заполните до {time_to.hour:02}:{time_to.minute:02}")
+            try:
+                await bot.send_message(id, f"У вас не заполнены дни :\n{" ".join(a)}\nПожалуйста заполните до {time_to.hour:02}:{time_to.minute:02}")
+            except TelegramForbiddenError:
+                logger.log(
+                    logging.WARNING, f"{find_official_name_by_id(id)} ({find_user_name_by_id(id)}) {id} - заблокировал бота")
 
 
 async def send_notifications_vosp():
@@ -119,7 +140,11 @@ async def send_notifications_vosp():
                    }
         a = is_full_days(my_dict, listik)
         if a != True:  # если не полный день
-            await bot.send_message(id, f"У вас не заполнены дни :\n{" ".join(a)}\nПожалуйста заполните до {time_to.hour:02}:{time_to.minute:02}")
+            try:
+                await bot.send_message(id, f"У вас не заполнены дни :\n{" ".join(a)}\nПожалуйста заполните до {time_to.hour:02}:{time_to.minute:02}")
+            except TelegramForbiddenError:
+                logger.log(
+                    logging.WARNING, f"{find_official_name_by_id(id)} ({find_user_name_by_id(id)}) {id} - заблокировал бота")
 
 
 def is_full_days(my_dict: dict, listik: list):
