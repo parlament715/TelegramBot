@@ -133,11 +133,14 @@ def is_full_day(my_dict: dict, date: str) -> str:
     my_dict["date"] = date
     if my_dict["user_role"] == "Воспитатель":
         if date_obj.weekday() == 6:
-            listik = ['Завтрак', 'Обед', 'Полдник', 'Ужин']
+            listik = ['Завтрак', 'Обед', 'Полдник', 'Ужин', "Паужин"]
         else:
-            listik = ["Завтрак", "Ужин"]
+            listik = ["Завтрак", "Ужин", "Паужин"]
     elif my_dict["user_role"] == "Классный советник":
-        listik = ["Завтрак", "Обед", "Полдник"]
+        if date_obj.weekday() == 6:
+            listik = []
+        else:
+            listik = ['Завтрак', 'Обед', 'Полдник', 'Ужин', "Паужин"]
     else:
         raise Exception("user_role must be Классный советник or Воспитатель")
     for time in listik:
