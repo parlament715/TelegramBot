@@ -172,7 +172,7 @@ def is_full_day_list(my_dict: dict, date: str) -> list:
         if date_obj.weekday() == 6:
             listik = []
         else:
-            listik = ['Завтрак', 'Обед', 'Полдник', 'Ужин', "Паужин"]
+            listik = ['Завтрак', 'Обед', 'Полдник']
     else:
         raise Exception("user_role must be Классный советник or Воспитатель")
     for time in listik:
