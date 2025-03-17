@@ -7,3 +7,4 @@ app/smth.py
 docx.docx
 venv
 *.log
+.idea/
