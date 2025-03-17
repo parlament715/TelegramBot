@@ -17,7 +17,7 @@ from app.users.objects_class import find_user_name_by_id, find_official_name_by_
 from config import time_to
 from icecream import ic
 import logging
-from aiogram.exceptions import TelegramForbiddenError
+from aiogram.exceptions import TelegramForbiddenError, TelegramBadRequest
 logger = logging.getLogger(__name__)
 handler = logging.FileHandler(
     f"{__name__}.log", mode='w', encoding="UTF-8")
@@ -34,6 +34,10 @@ async def send_to_teacher(text):
         except TelegramForbiddenError:
             logger.log(
                 logging.WARNING, f"{find_official_name_by_id(ID)} ({find_user_name_by_id(ID)}) {ID} - заблокировал бота")
+        except TelegramBadRequest as e:
+            logger.log(
+                logging.WARNING,
+                f"{find_official_name_by_id(ID)} ({find_user_name_by_id(ID)}) {ID} - {e}")
 
 
 async def send_to_vosp(text):
@@ -43,6 +47,10 @@ async def send_to_vosp(text):
         except TelegramForbiddenError:
             logger.log(
                 logging.WARNING, f"{find_official_name_by_id(ID)} ({find_user_name_by_id(ID)}) {ID} - заблокировал бота")
+        except TelegramBadRequest as e:
+            logger.log(
+                logging.WARNING,
+                f"{find_official_name_by_id(ID)} ({find_user_name_by_id(ID)}) {ID} - {e}")
 
 
 async def send_document():
@@ -117,6 +125,10 @@ async def send_notifications_teacher():
             except TelegramForbiddenError:
                 logger.log(
                     logging.WARNING, f"{find_official_name_by_id(id)} ({find_user_name_by_id(id)}) {id} - заблокировал бота")
+            except TelegramBadRequest as e:
+                logger.log(
+                    logging.WARNING,
+                    f"{find_official_name_by_id(id)} ({find_user_name_by_id(id)}) {id} - {e}")
 
 
 async def send_notifications_vosp():
@@ -145,6 +157,10 @@ async def send_notifications_vosp():
             except TelegramForbiddenError:
                 logger.log(
                     logging.WARNING, f"{find_official_name_by_id(id)} ({find_user_name_by_id(id)}) {id} - заблокировал бота")
+            except TelegramBadRequest as e:
+                logger.log(
+                    logging.WARNING,
+                    f"{find_official_name_by_id(id)} ({find_user_name_by_id(id)}) {id} - {e}")
 
 
 def is_full_days(my_dict: dict, listik: list):
